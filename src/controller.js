@@ -16,26 +16,26 @@
  * IMA SDK integration plugin for Video.js. For more information see
  * https://www.github.com/googleads/videojs-ima
  */
-import PlayerWrapper from './player-wrapper.js';
-import AdUi from './ad-ui.js';
-import SdkImpl from './sdk-impl.js';
+import PlayerWrapper from './player-wrapper.js'
+import AdUi from './ad-ui.js'
+import SdkImpl from './sdk-impl.js'
 
- /**
-  * The grand coordinator of the plugin. Facilitates communication between all
-  * other plugin classes.
-  *
-  * @param {Object} player Instance of the video.js player.
-  * @param {Object} options Options provided by the implementation.
-  * @constructor
-  * @struct
-  * @final
-  */
+/**
+ * The grand coordinator of the plugin. Facilitates communication between all
+ * other plugin classes.
+ *
+ * @param {Object} player Instance of the video.js player.
+ * @param {Object} options Options provided by the implementation.
+ * @constructor
+ * @struct
+ * @final
+ */
 const Controller = function(player, options) {
   /**
    * Stores user-provided settings.
    * @type {Object}
    */
-  this.settings = {};
+  this.settings = {}
 
   /**
    * Content and ads ended listeners passed by the publisher to the plugin.
@@ -45,22 +45,23 @@ const Controller = function(player, options) {
    * playing, whereas the contentAndAdsEndedListeners will fire after the
    * post-roll completes.
    */
-  this.contentAndAdsEndedListeners = [];
+  this.contentAndAdsEndedListeners = []
 
   /**
    * Whether or not we are running on a mobile platform.
    */
-  this.isMobile = (navigator.userAgent.match(/iPhone/i) ||
-      navigator.userAgent.match(/iPad/i) ||
-      navigator.userAgent.match(/Android/i));
+  this.isMobile =
+    navigator.userAgent.match(/iPhone/i) ||
+    navigator.userAgent.match(/iPad/i) ||
+    navigator.userAgent.match(/Android/i)
 
   /**
    * Whether or not we are running on an iOS platform.
    */
-  this.isIos = (navigator.userAgent.match(/iPhone/i) ||
-      navigator.userAgent.match(/iPad/i));
+  this.isIos =
+    navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i)
 
-  this.initWithSettings(options);
+  this.initWithSettings(options)
 
   /**
    * Stores contrib-ads default settings.
@@ -68,16 +69,18 @@ const Controller = function(player, options) {
   const contribAdsDefaults = {
     debug: this.settings.debug,
     timeout: this.settings.timeout,
-    prerollTimeout: this.settings.prerollTimeout,
-  };
+    prerollTimeout: this.settings.prerollTimeout
+  }
   const adsPluginSettings = this.extend(
-      {}, contribAdsDefaults, options.contribAdsSettings || {});
+    {},
+    contribAdsDefaults,
+    options.contribAdsSettings || {}
+  )
 
-  this.playerWrapper = new PlayerWrapper(player, adsPluginSettings, this);
-  this.adUi = new AdUi(this);
-  this.sdkImpl = new SdkImpl(this);
-};
-
+  this.playerWrapper = new PlayerWrapper(player, adsPluginSettings, this)
+  this.adUi = new AdUi(this)
+  this.sdkImpl = new SdkImpl(this)
+}
 
 Controller.IMA_DEFAULTS = {
   adLabel: 'Advertisement',
@@ -88,8 +91,8 @@ Controller.IMA_DEFAULTS = {
   preventLateAdStart: false,
   requestMode: 'onLoad',
   showControlsForJSAds: true,
-  timeout: 5000,
-};
+  timeout: 5000
+}
 
 /**
  * Extends the settings to include user-provided settings.
@@ -97,17 +100,16 @@ Controller.IMA_DEFAULTS = {
  * @param {Object} options Options to be used in initialization.
  */
 Controller.prototype.initWithSettings = function(options) {
-  this.settings = this.extend({}, Controller.IMA_DEFAULTS, options || {});
+  this.settings = this.extend({}, Controller.IMA_DEFAULTS, options || {})
 
-  this.warnAboutDeprecatedSettings();
+  this.warnAboutDeprecatedSettings()
 
   // Default showing countdown timer to true.
-  this.showCountdown = true;
+  this.showCountdown = true
   if (this.settings.showCountdown === false) {
-    this.showCountdown = false;
+    this.showCountdown = false
   }
-};
-
+}
 
 /**
  * Logs console warnings when deprecated settings are used.
@@ -117,16 +119,14 @@ Controller.prototype.warnAboutDeprecatedSettings = function() {
     'adWillAutoplay',
     'adsWillAutoplay',
     'adWillPlayMuted',
-    'adsWillPlayMuted',
-  ];
-  deprecatedSettings.forEach((setting) => {
+    'adsWillPlayMuted'
+  ]
+  deprecatedSettings.forEach(setting => {
     if (this.settings[setting] !== undefined) {
-      console.warn(
-        'WARNING: videojs.ima setting ' + setting + ' is deprecated');
+      console.warn('WARNING: videojs.ima setting ' + setting + ' is deprecated')
     }
-  });
-};
-
+  })
+}
 
 /**
  * Return the settings object.
@@ -134,9 +134,8 @@ Controller.prototype.warnAboutDeprecatedSettings = function() {
  * @return {Object} The settings object.
  */
 Controller.prototype.getSettings = function() {
-  return this.settings;
-};
-
+  return this.settings
+}
 
 /**
  * Return whether or not we're in a mobile environment.
@@ -144,8 +143,8 @@ Controller.prototype.getSettings = function() {
  * @return {boolean} True if running on mobile, false otherwise.
  */
 Controller.prototype.getIsMobile = function() {
-  return this.isMobile;
-};
+  return this.isMobile
+}
 
 /**
  * Return whether or not we're in an iOS environment.
@@ -153,9 +152,8 @@ Controller.prototype.getIsMobile = function() {
  * @return {boolean} True if running on iOS, false otherwise.
  */
 Controller.prototype.getIsIos = function() {
-  return this.isIos;
-};
-
+  return this.isIos
+}
 
 /**
  * Inject the ad container div into the DOM.
@@ -163,25 +161,22 @@ Controller.prototype.getIsIos = function() {
  * @param{HTMLElement} adContainerDiv The ad container div.
  */
 Controller.prototype.injectAdContainerDiv = function(adContainerDiv) {
-  this.playerWrapper.injectAdContainerDiv(adContainerDiv);
-};
-
+  this.playerWrapper.injectAdContainerDiv(adContainerDiv)
+}
 
 /**
  * @return {HTMLElement} The div for the ad container.
  */
 Controller.prototype.getAdContainerDiv = function() {
-  return this.adUi.getAdContainerDiv();
-};
-
+  return this.adUi.getAdContainerDiv()
+}
 
 /**
  * @return {Object} The content player.
  */
 Controller.prototype.getContentPlayer = function() {
-  return this.playerWrapper.getContentPlayer();
-};
-
+  return this.playerWrapper.getContentPlayer()
+}
 
 /**
  * Returns the content playhead tracker.
@@ -189,17 +184,15 @@ Controller.prototype.getContentPlayer = function() {
  * @return {Object} The content playhead tracker.
  */
 Controller.prototype.getContentPlayheadTracker = function() {
-  return this.playerWrapper.getContentPlayheadTracker();
-};
-
+  return this.playerWrapper.getContentPlayheadTracker()
+}
 
 /**
  * Requests ads.
  */
 Controller.prototype.requestAds = function() {
-  this.sdkImpl.requestAds();
-};
-
+  this.sdkImpl.requestAds()
+}
 
 /**
  * Add or modify a setting.
@@ -208,9 +201,8 @@ Controller.prototype.requestAds = function() {
  * @param {Object} value Value to set at key.
  */
 Controller.prototype.setSetting = function(key, value) {
-  this.settings[key] = value;
-};
-
+  this.settings[key] = value
+}
 
 /**
  * Called when there is an error loading ads.
@@ -218,24 +210,22 @@ Controller.prototype.setSetting = function(key, value) {
  * @param {Object} adErrorEvent The ad error event thrown by the IMA SDK.
  */
 Controller.prototype.onErrorLoadingAds = function(adErrorEvent) {
-  this.adUi.onAdError();
-  this.playerWrapper.onAdError(adErrorEvent);
-};
-
+  this.adUi.onAdError()
+  this.playerWrapper.onAdError(adErrorEvent)
+}
 
 /**
  * Called by the ad UI when the play/pause button is clicked.
  */
 Controller.prototype.onAdPlayPauseClick = function() {
   if (this.sdkImpl.isAdPlaying()) {
-    this.adUi.onAdsPaused();
-    this.sdkImpl.pauseAds();
+    this.adUi.onAdsPaused()
+    this.sdkImpl.pauseAds()
   } else {
-    this.adUi.onAdsPlaying();
-    this.sdkImpl.resumeAds();
+    this.adUi.onAdsPlaying()
+    this.sdkImpl.resumeAds()
   }
-};
-
+}
 
 /**
  * Called by the ad UI when the mute button is clicked.
@@ -243,16 +233,15 @@ Controller.prototype.onAdPlayPauseClick = function() {
  */
 Controller.prototype.onAdMuteClick = function() {
   if (this.sdkImpl.isAdMuted()) {
-    this.playerWrapper.unmute();
-    this.adUi.unmute();
-    this.sdkImpl.unmute();
+    this.playerWrapper.unmute()
+    this.adUi.unmute()
+    this.sdkImpl.unmute()
   } else {
-    this.playerWrapper.mute();
-    this.adUi.mute();
-    this.sdkImpl.mute();
+    this.playerWrapper.mute()
+    this.adUi.mute()
+    this.sdkImpl.mute()
   }
-};
-
+}
 
 /**
  * Set the volume of the player and ads. 0-1.
@@ -260,26 +249,23 @@ Controller.prototype.onAdMuteClick = function() {
  * @param {number} volume The new volume.
  */
 Controller.prototype.setVolume = function(volume) {
-  this.playerWrapper.setVolume(volume);
-  this.sdkImpl.setVolume(volume);
-};
-
+  this.playerWrapper.setVolume(volume)
+  this.sdkImpl.setVolume(volume)
+}
 
 /**
  * @return {number} The volume of the content player.
  */
 Controller.prototype.getPlayerVolume = function() {
-  return this.playerWrapper.getVolume();
-};
-
+  return this.playerWrapper.getVolume()
+}
 
 /**
  * Toggle fullscreen state.
  */
 Controller.prototype.toggleFullscreen = function() {
-  this.playerWrapper.toggleFullscreen();
-};
-
+  this.playerWrapper.toggleFullscreen()
+}
 
 /**
  * Relays ad errors to the player wrapper.
@@ -287,9 +273,9 @@ Controller.prototype.toggleFullscreen = function() {
  * @param {Object} adErrorEvent The ad error event thrown by the IMA SDK.
  */
 Controller.prototype.onAdError = function(adErrorEvent) {
-  this.adUi.onAdError();
-  this.playerWrapper.onAdError(adErrorEvent);
-};
+  this.adUi.onAdError()
+  this.playerWrapper.onAdError(adErrorEvent)
+}
 
 /**
  * Handles ad break starting.
@@ -297,52 +283,46 @@ Controller.prototype.onAdError = function(adErrorEvent) {
  * @param {Object} adEvent The event fired by the IMA SDK.
  */
 Controller.prototype.onAdBreakStart = function(adEvent) {
-  this.playerWrapper.onAdBreakStart();
-  this.adUi.onAdBreakStart(adEvent);
-};
-
+  this.playerWrapper.onAdBreakStart()
+  this.adUi.onAdBreakStart(adEvent)
+}
 
 /**
  * Show the ad container.
  */
 Controller.prototype.showAdContainer = function() {
-  this.adUi.showAdContainer();
-};
-
+  this.adUi.showAdContainer()
+}
 
 /**
  * Handles ad break ending.
  */
 Controller.prototype.onAdBreakEnd = function() {
-  this.playerWrapper.onAdBreakEnd();
-  this.adUi.onAdBreakEnd();
-};
-
+  this.playerWrapper.onAdBreakEnd()
+  this.adUi.onAdBreakEnd()
+}
 
 /**
  * Handles when all ads have finished playing.
  */
 Controller.prototype.onAllAdsCompleted = function() {
-  this.adUi.onAllAdsCompleted();
-  this.playerWrapper.onAllAdsCompleted();
-};
-
+  this.adUi.onAllAdsCompleted()
+  this.playerWrapper.onAllAdsCompleted()
+}
 
 /**
  * Handles the SDK firing an ad paused event.
  */
 Controller.prototype.onAdsPaused = function() {
-  this.adUi.onAdsPaused();
-};
-
+  this.adUi.onAdsPaused()
+}
 
 /**
  * Handles the SDK firing an ad resumed event.
  */
 Controller.prototype.onAdsResumed = function() {
-  this.adUi.onAdsResumed();
-};
-
+  this.adUi.onAdsResumed()
+}
 
 /**
  * Takes data from the sdk impl and passes it to the ad UI to update the UI.
@@ -353,62 +333,66 @@ Controller.prototype.onAdsResumed = function() {
  * @param {number} adPosition Index of the ad in the pod.
  * @param {number} totalAds Total number of ads in the pod.
  */
-Controller.prototype.onAdPlayheadUpdated =
-    function(currentTime, remainingTime, duration, adPosition, totalAds) {
+Controller.prototype.onAdPlayheadUpdated = function(
+  currentTime,
+  remainingTime,
+  duration,
+  adPosition,
+  totalAds
+) {
   this.adUi.updateAdUi(
-      currentTime, remainingTime, duration, adPosition, totalAds);
-};
+    currentTime,
+    remainingTime,
+    duration,
+    adPosition,
+    totalAds
+  )
+}
 
 /**
  * Handles ad log messages.
  * @param {google.ima.AdEvent} adEvent The AdEvent thrown by the IMA SDK.
  */
 Controller.prototype.onAdLog = function(adEvent) {
-  this.playerWrapper.onAdLog(adEvent);
-};
-
+  this.playerWrapper.onAdLog(adEvent)
+}
 
 /**
  * @return {Object} The current ad.
  */
 Controller.prototype.getCurrentAd = function() {
-  return this.sdkImpl.getCurrentAd();
-};
-
+  return this.sdkImpl.getCurrentAd()
+}
 
 /**
  * Play content.
  */
 Controller.prototype.playContent = function() {
-  this.playerWrapper.play();
-};
-
+  this.playerWrapper.play()
+}
 
 /**
  * Handles when a linear ad starts.
  */
 Controller.prototype.onLinearAdStart = function() {
-  this.adUi.onLinearAdStart();
-  this.playerWrapper.onAdStart();
-};
-
+  this.adUi.onLinearAdStart()
+  this.playerWrapper.onAdStart()
+}
 
 /**
  * Handles when a non-linear ad loads.
  */
 Controller.prototype.onNonLinearAdLoad = function() {
-  this.adUi.onNonLinearAdLoad();
-};
-
+  this.adUi.onNonLinearAdLoad()
+}
 
 /**
  * Handles when a non-linear ad starts.
  */
 Controller.prototype.onNonLinearAdStart = function() {
-  this.adUi.onNonLinearAdLoad();
-  this.playerWrapper.onAdStart();
-};
-
+  this.adUi.onNonLinearAdLoad()
+  this.playerWrapper.onAdStart()
+}
 
 /**
  * Get the player width.
@@ -416,9 +400,8 @@ Controller.prototype.onNonLinearAdStart = function() {
  * @return {number} The width of the player.
  */
 Controller.prototype.getPlayerWidth = function() {
-  return this.playerWrapper.getPlayerWidth();
-};
-
+  return this.playerWrapper.getPlayerWidth()
+}
 
 /**
  * Get the player height.
@@ -426,17 +409,15 @@ Controller.prototype.getPlayerWidth = function() {
  * @return {number} The height of the player.
  */
 Controller.prototype.getPlayerHeight = function() {
-  return this.playerWrapper.getPlayerHeight();
-};
-
+  return this.playerWrapper.getPlayerHeight()
+}
 
 /**
  * Tells the player wrapper that ads are ready.
  */
 Controller.prototype.onAdsReady = function() {
-  this.playerWrapper.onAdsReady();
-};
-
+  this.playerWrapper.onAdsReady()
+}
 
 /**
  * Called when the player wrapper detects that the player has been resized.
@@ -445,24 +426,23 @@ Controller.prototype.onAdsReady = function() {
  * @param {number} height The post-resize height of the player.
  */
 Controller.prototype.onPlayerResize = function(width, height) {
-  this.sdkImpl.onPlayerResize(width, height);
-};
-
+  this.sdkImpl.onPlayerResize(width, height)
+}
 
 /**
  * Called by the player wrapper when content completes.
  */
 Controller.prototype.onContentComplete = function() {
-  this.sdkImpl.onContentComplete();
-};
+  this.sdkImpl.onContentComplete()
+}
 
 /**
  * Called by the player wrapper when it's time to play a post-roll but we don't
  * have one to play.
  */
 Controller.prototype.onNoPostroll = function() {
-  this.playerWrapper.onNoPostroll();
-};
+  this.playerWrapper.onNoPostroll()
+}
 
 /**
  * Called when content and all ads have completed.
@@ -470,61 +450,55 @@ Controller.prototype.onNoPostroll = function() {
 Controller.prototype.onContentAndAdsCompleted = function() {
   for (let index in this.contentAndAdsEndedListeners) {
     if (typeof this.contentAndAdsEndedListeners[index] === 'function') {
-      this.contentAndAdsEndedListeners[index]();
+      this.contentAndAdsEndedListeners[index]()
     }
   }
-};
-
+}
 
 /**
  * Called when the player is disposed.
  */
 Controller.prototype.onPlayerDisposed = function() {
-  this.contentAndAdsEndedListeners = [];
-  this.sdkImpl.onPlayerDisposed();
-};
-
+  this.contentAndAdsEndedListeners = []
+  this.sdkImpl.onPlayerDisposed()
+}
 
 /**
  * Called when the player is ready to play a pre-roll.
  */
 Controller.prototype.onPlayerReadyForPreroll = function() {
-  this.sdkImpl.onPlayerReadyForPreroll();
-};
+  this.sdkImpl.onPlayerReadyForPreroll()
+}
 
 /**
  * Called if the ad times out.
  */
 Controller.prototype.onAdTimeout = function() {
-  this.sdkImpl.onAdTimeout();
-};
-
+  this.sdkImpl.onAdTimeout()
+}
 
 /**
  * Called when the player is ready.
  */
 Controller.prototype.onPlayerReady = function() {
-  this.sdkImpl.onPlayerReady();
-};
-
+  this.sdkImpl.onPlayerReady()
+}
 
 /**
  * Called when the player enters fullscreen.
  */
 Controller.prototype.onPlayerEnterFullscreen = function() {
-  this.adUi.onPlayerEnterFullscreen();
-  this.sdkImpl.onPlayerEnterFullscreen();
-};
-
+  this.adUi.onPlayerEnterFullscreen()
+  this.sdkImpl.onPlayerEnterFullscreen()
+}
 
 /**
  * Called when the player exits fullscreen.
  */
 Controller.prototype.onPlayerExitFullscreen = function() {
-  this.adUi.onPlayerExitFullscreen();
-  this.sdkImpl.onPlayerExitFullscreen();
-};
-
+  this.adUi.onPlayerExitFullscreen()
+  this.sdkImpl.onPlayerExitFullscreen()
+}
 
 /**
  * Called when the player volume changes.
@@ -532,10 +506,9 @@ Controller.prototype.onPlayerExitFullscreen = function() {
  * @param {number} volume The new player volume.
  */
 Controller.prototype.onPlayerVolumeChanged = function(volume) {
-  this.adUi.onPlayerVolumeChanged(volume);
-  this.sdkImpl.onPlayerVolumeChanged(volume);
-};
-
+  this.adUi.onPlayerVolumeChanged(volume)
+  this.sdkImpl.onPlayerVolumeChanged(volume)
+}
 
 /**
  * Sets the content of the video player. You should use this method instead
@@ -546,13 +519,11 @@ Controller.prototype.onPlayerVolumeChanged = function(volume) {
  * @param {?string} adTag The ad tag to be requested when the content loads.
  *     Leave blank to use the existing ad tag.
  */
-Controller.prototype.setContentWithAdTag =
-    function(contentSrc, adTag) {
-  this.reset();
-  this.settings.adTagUrl = adTag ? adTag : this.settings.adTagUrl;
-  this.playerWrapper.changeSource(contentSrc);
-};
-
+Controller.prototype.setContentWithAdTag = function(contentSrc, adTag) {
+  this.reset()
+  this.settings.adTagUrl = adTag ? adTag : this.settings.adTagUrl
+  this.playerWrapper.changeSource(contentSrc)
+}
 
 /**
  * Sets the content of the video player. You should use this method instead
@@ -563,13 +534,16 @@ Controller.prototype.setContentWithAdTag =
  * @param {?string} adsResponse The ads response to be requested when the
  *     content loads. Leave blank to use the existing ads response.
  */
-Controller.prototype.setContentWithAdsResponse =
-    function(contentSrc, adsResponse) {
-  this.reset();
-  this.settings.adsResponse =
-      adsResponse ? adsResponse : this.settings.adsResponse;
-  this.playerWrapper.changeSource(contentSrc);
-};
+Controller.prototype.setContentWithAdsResponse = function(
+  contentSrc,
+  adsResponse
+) {
+  this.reset()
+  this.settings.adsResponse = adsResponse
+    ? adsResponse
+    : this.settings.adsResponse
+  this.playerWrapper.changeSource(contentSrc)
+}
 
 /**
  * Sets the content of the video player. You should use this method instead
@@ -580,31 +554,29 @@ Controller.prototype.setContentWithAdsResponse =
  * @param {?Object} adsRequest The ads request to be requested when the
  *     content loads. Leave blank to use the existing ads request.
  */
-Controller.prototype.setContentWithAdsRequest =
-    function(contentSrc, adsRequest) {
-  this.reset();
-  this.settings.adsRequest =
-      adsRequest ? adsRequest : this.settings.adsRequest;
-  this.playerWrapper.changeSource(contentSrc);
-};
-
+Controller.prototype.setContentWithAdsRequest = function(
+  contentSrc,
+  adsRequest
+) {
+  this.reset()
+  this.settings.adsRequest = adsRequest ? adsRequest : this.settings.adsRequest
+  this.playerWrapper.changeSource(contentSrc)
+}
 
 /**
  * Resets the state of the plugin.
  */
 Controller.prototype.reset = function() {
-  this.sdkImpl.reset();
-  this.playerWrapper.reset();
-  this.adUi.reset();
-};
-
+  this.sdkImpl.reset()
+  this.playerWrapper.reset()
+  this.adUi.reset()
+}
 
 /**
  * Listener JSDoc for ESLint. This listener can be passed to
  * (add|remove)ContentEndedListener.
  * @callback listener
  */
-
 
 /**
  * Adds a listener for the 'contentended' event of the video player. This should
@@ -615,9 +587,8 @@ Controller.prototype.reset = function() {
  *     completes.
  */
 Controller.prototype.addContentEndedListener = function(listener) {
-  this.playerWrapper.addContentEndedListener(listener);
-};
-
+  this.playerWrapper.addContentEndedListener(listener)
+}
 
 /**
  * Adds a listener that will be called when content and all ads have
@@ -626,9 +597,8 @@ Controller.prototype.addContentEndedListener = function(listener) {
  *     complete.
  */
 Controller.prototype.addContentAndAdsEndedListener = function(listener) {
-  this.contentAndAdsEndedListeners.push(listener);
-};
-
+  this.contentAndAdsEndedListeners.push(listener)
+}
 
 /**
  * Sets the listener to be called to trigger manual ad break playback.
@@ -636,9 +606,8 @@ Controller.prototype.addContentAndAdsEndedListener = function(listener) {
  *     break playback.
  */
 Controller.prototype.setAdBreakReadyListener = function(listener) {
-  this.sdkImpl.setAdBreakReadyListener(listener);
-};
-
+  this.sdkImpl.setAdBreakReadyListener(listener)
+}
 
 /**
  * Changes the flag to show or hide the ad countdown timer.
@@ -646,35 +615,31 @@ Controller.prototype.setAdBreakReadyListener = function(listener) {
  * @param {boolean} showCountdownIn Show or hide the countdown timer.
  */
 Controller.prototype.setShowCountdown = function(showCountdownIn) {
-  this.adUi.setShowCountdown(showCountdownIn);
-  this.showCountdown = showCountdownIn;
-  this.adUi.countdownDiv.style.display = this.showCountdown ? 'block' : 'none';
-};
-
+  this.adUi.setShowCountdown(showCountdownIn)
+  this.showCountdown = showCountdownIn
+  this.adUi.countdownDiv.style.display = this.showCountdown ? 'block' : 'none'
+}
 
 /**
  * Initializes the AdDisplayContainer. On mobile, this must be done as a
  * result of user action.
  */
 Controller.prototype.initializeAdDisplayContainer = function() {
-  this.sdkImpl.initializeAdDisplayContainer();
-};
-
+  this.sdkImpl.initializeAdDisplayContainer()
+}
 
 /**
  * Called by publishers in manual ad break playback mode to start an ad
  * break.
  */
 Controller.prototype.playAdBreak = function() {
-  this.sdkImpl.playAdBreak();
-};
-
+  this.sdkImpl.playAdBreak()
+}
 
 /**
  * Callback JSDoc for ESLint. This callback can be passed to addEventListener.
  * @callback callback
  */
-
 
 /**
  * Ads an EventListener to the AdsManager. For a list of available events,
@@ -685,25 +650,24 @@ Controller.prototype.playAdBreak = function() {
  * @param {callback} callback The method to call when the event is fired.
  */
 Controller.prototype.addEventListener = function(event, callback) {
-  this.sdkImpl.addEventListener(event, callback);
-};
-
+  this.sdkImpl.addEventListener(event, callback)
+}
 
 /**
  * Returns the instance of the AdsManager.
  * @return {google.ima.AdsManager} The AdsManager being used by the plugin.
  */
 Controller.prototype.getAdsManager = function() {
-  return this.sdkImpl.getAdsManager();
-};
+  return this.sdkImpl.getAdsManager()
+}
 
 /**
  * Returns the instance of the player id.
  * @return {string} The player id.
  */
 Controller.prototype.getPlayerId = function() {
-  return this.playerWrapper.getPlayerId();
-};
+  return this.playerWrapper.getPlayerId()
+}
 
 /**
  * Changes the ad tag. You will need to call requestAds after this method
@@ -712,63 +676,60 @@ Controller.prototype.getPlayerId = function() {
  *     requestAds is called.
  */
 Controller.prototype.changeAdTag = function(adTag) {
-  this.reset();
-  this.settings.adTagUrl = adTag;
-};
-
+  this.reset()
+  this.settings.adTagUrl = adTag
+}
 
 /**
  * Pauses the ad.
  */
 Controller.prototype.pauseAd = function() {
-  this.adUi.onAdsPaused();
-  this.sdkImpl.pauseAds();
-};
-
+  this.adUi.onAdsPaused()
+  this.sdkImpl.pauseAds()
+}
 
 /**
  * Resumes the ad.
  */
 Controller.prototype.resumeAd = function() {
-  this.adUi.onAdsPlaying();
-  this.sdkImpl.resumeAds();
-};
+  this.adUi.onAdsPlaying()
+  this.sdkImpl.resumeAds()
+}
 
 /**
  * Toggles video/ad playback.
  */
 Controller.prototype.togglePlayback = function() {
-  this.playerWrapper.togglePlayback();
-};
+  this.playerWrapper.togglePlayback()
+}
 
 /**
  * @return {boolean} true if we expect that ads will autoplay. false otherwise.
  */
 Controller.prototype.adsWillAutoplay = function() {
   if (this.settings.adsWillAutoplay !== undefined) {
-    return this.settings.adsWillAutoplay;
+    return this.settings.adsWillAutoplay
   } else if (this.settings.adWillAutoplay !== undefined) {
-    return this.settings.adWillAutoplay;
+    return this.settings.adWillAutoplay
   } else {
-    return !!this.playerWrapper.getPlayerOptions().autoplay;
+    return !!this.playerWrapper.getPlayerOptions().autoplay
   }
-};
-
+}
 
 /**
  * @return {boolean} true if we expect that ads will autoplay. false otherwise.
  */
 Controller.prototype.adsWillPlayMuted = function() {
   if (this.settings.adsWillPlayMuted !== undefined) {
-    return this.settings.adsWillPlayMuted;
+    return this.settings.adsWillPlayMuted
   } else if (this.settings.adWillPlayMuted !== undefined) {
-    return this.settings.adWillPlayMuted;
+    return this.settings.adWillPlayMuted
   } else if (this.playerWrapper.getPlayerOptions().muted !== undefined) {
-    return this.playerWrapper.getPlayerOptions().muted;
+    return this.playerWrapper.getPlayerOptions().muted
   } else {
-    return this.playerWrapper.getVolume() == 0;
+    return this.playerWrapper.getVolume() == 0
   }
-};
+}
 
 /**
  * Triggers an event on the VJS player
@@ -776,9 +737,8 @@ Controller.prototype.adsWillPlayMuted = function() {
  * @param  {Object} data The event data.
  */
 Controller.prototype.triggerPlayerEvent = function(name, data) {
-  this.playerWrapper.triggerPlayerEvent(name, data);
-};
-
+  this.playerWrapper.triggerPlayerEvent(name, data)
+}
 
 /**
  * Extends an object to include the contents of objects at parameters 2 onward.
@@ -790,18 +750,18 @@ Controller.prototype.triggerPlayerEvent = function(name, data) {
  * @return {Object} The extended object.
  */
 Controller.prototype.extend = function(obj, ...args) {
-  let arg;
-  let index;
-  let key;
+  let arg
+  let index
+  let key
   for (index = 0; index < args.length; index++) {
-    arg = args[index];
+    arg = args[index]
     for (key in arg) {
       if (arg.hasOwnProperty(key)) {
-        obj[key] = arg[key];
+        obj[key] = arg[key]
       }
     }
   }
-  return obj;
-};
+  return obj
+}
 
-export default Controller;
+export default Controller
