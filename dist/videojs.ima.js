@@ -120,20 +120,18 @@ var PlayerWrapper = function PlayerWrapper(player, adsPluginSettings, controller
     previousTime: 0,
     seeking: false,
     duration: 0
-  };
 
-  /**
-   * Player dimensions. Used in our resize check.
-   */
-  this.vjsPlayerDimensions = {
+    /**
+     * Player dimensions. Used in our resize check.
+     */
+  };this.vjsPlayerDimensions = {
     width: this.getPlayerWidth(),
     height: this.getPlayerHeight()
-  };
 
-  /**
-   * Video.js control bar.
-   */
-  this.vjsControls = this.vjsPlayer.getChild('controlBar');
+    /**
+     * Video.js control bar.
+     */
+  };this.vjsControls = this.vjsPlayer.getChild('controlBar');
 
   /**
    * Vanilla HTML5 video player underneath the video.js player.
@@ -458,10 +456,13 @@ PlayerWrapper.prototype.getContentPlayheadTracker = function () {
 PlayerWrapper.prototype.onAdError = function (adErrorEvent) {
   this.vjsControls.show();
   var errorMessage = adErrorEvent.getError !== undefined ? adErrorEvent.getError() : adErrorEvent.stack;
-  this.vjsPlayer.trigger({ type: 'adserror', data: {
+  this.vjsPlayer.trigger({
+    type: 'adserror',
+    data: {
       AdError: errorMessage,
       AdErrorEvent: adErrorEvent
-    } });
+    }
+  });
 };
 
 /**
@@ -471,10 +472,13 @@ PlayerWrapper.prototype.onAdError = function (adErrorEvent) {
 PlayerWrapper.prototype.onAdLog = function (adEvent) {
   var adData = adEvent.getAdData();
   var errorMessage = adData['adError'] !== undefined ? adData['adError'].getMessage() : undefined;
-  this.vjsPlayer.trigger({ type: 'adslog', data: {
+  this.vjsPlayer.trigger({
+    type: 'adslog',
+    data: {
       AdError: errorMessage,
       AdEvent: adEvent
-    } });
+    }
+  });
 };
 
 /**
@@ -638,26 +642,23 @@ var AdUi = function AdUi(controller) {
    * Plugin controller.
    */
   this.controller = controller;
-
+  this.vnode = this.controller.settings.vnode || {};
   /**
    * Div used as an ad container.
    */
-  this.adContainerDiv = document.createElement('div');
-
+  this.adContainerDiv = this.getVNodeElement(this.vnode.adControl);
   /**
    * Div used to display ad controls.
    */
-  this.controlsDiv = document.createElement('div');
-
+  this.controlsDiv = this.getVNodeElement(this.vnode.controlsDiv);
   /**
    * Div used to display ad countdown timer.
    */
-  this.countdownDiv = document.createElement('div');
-
+  this.countdownDiv = this.getVNodeElement(this.vnode.countdownDiv);
   /**
    * Div used to display add seek bar.
    */
-  this.seekBarDiv = document.createElement('div');
+  this.seekBarDiv = this.getVNodeElement(this.vnode.seekBarDiv);
 
   /**
    * Div used to display ad progress (in seek bar).
@@ -667,27 +668,27 @@ var AdUi = function AdUi(controller) {
   /**
    * Div used to display ad play/pause button.
    */
-  this.playPauseDiv = document.createElement('div');
+  this.playPauseDiv = this.getVNodeElement(this.vnode.playPauseDiv);
 
   /**
    * Div used to display ad mute button.
    */
-  this.muteDiv = document.createElement('div');
+  this.muteDiv = this.getVNodeElement(this.vnode.muteDiv);
 
   /**
    * Div used by the volume slider.
    */
-  this.sliderDiv = document.createElement('div');
+  this.sliderDiv = this.getVNodeElement(this.vnode.sliderDiv);
 
   /**
    * Volume slider level visuals
    */
-  this.sliderLevelDiv = document.createElement('div');
+  // this.sliderLevelDiv = document.createElement('div')
 
   /**
    * Div used to display ad fullscreen button.
    */
-  this.fullscreenDiv = document.createElement('div');
+  this.fullscreenDiv = this.getVNodeElement(this.vnode.fullscreenDiv);
 
   /**
    * Bound event handler for onMouseUp.
@@ -703,17 +704,16 @@ var AdUi = function AdUi(controller) {
    * Stores data for the ad playhead tracker.
    */
   this.adPlayheadTracker = {
-    'currentTime': 0,
-    'duration': 0,
-    'isPod': false,
-    'adPosition': 0,
-    'totalAds': 0
-  };
+    currentTime: 0,
+    duration: 0,
+    isPod: false,
+    adPosition: 0,
+    totalAds: 0
 
-  /**
-   * Used to prefix videojs ima controls.
-   */
-  this.controlPrefix = this.controller.getPlayerId() + '_';
+    /**
+     * Used to prefix videojs ima controls.
+     */
+  };this.controlPrefix = this.controller.getPlayerId() + '_';
 
   /**
    * Boolean flag to show or hide the ad countdown timer.
@@ -731,33 +731,65 @@ var AdUi = function AdUi(controller) {
   this.createAdContainer();
 };
 
+AdUi.prototype.getVNodeElement = function (el) {
+  if (el && el.$el instanceof Element) {
+    return el.$el;
+  } else if (el instanceof Element) {
+    return el;
+  } else return document.createElement('div');
+};
+
 /**
  * Creates the ad container.
  */
 AdUi.prototype.createAdContainer = function () {
-  this.assignControlAttributes(this.adContainerDiv, 'ima-ad-container');
-  this.adContainerDiv.style.position = 'absolute';
-  this.adContainerDiv.style.zIndex = 1111;
-  this.adContainerDiv.addEventListener('mouseenter', this.showAdControls.bind(this), false);
-  this.adContainerDiv.addEventListener('mouseleave', this.hideAdControls.bind(this), false);
-  this.adContainerDiv.addEventListener('click', this.onAdContainerClick.bind(this), false);
-  this.createControls();
-  this.controller.injectAdContainerDiv(this.adContainerDiv);
+  var _this = this;
+
+  if (this.vnode) {
+    this.vnode.adControl.$on('mouseenter', function () {
+      _this.showAdControls();
+    });
+    this.vnode.adControl.$on('mouseleave', function () {
+      _this.hideAdControls();
+    });
+    this.vnode.adControl.$on('click', function () {
+      _this.onAdContainerClick();
+    });
+    this.createControls();
+    this.controller.injectAdContainerDiv(this.adContainerDiv);
+  } else {
+    this.assignControlAttributes(this.adContainerDiv, 'ima-ad-container');
+    this.adContainerDiv.style.position = 'absolute';
+    this.adContainerDiv.style.zIndex = 1111;
+    this.adContainerDiv.addEventListener('mouseenter', this.showAdControls.bind(this), false);
+    this.adContainerDiv.addEventListener('mouseleave', this.hideAdControls.bind(this), false);
+    this.adContainerDiv.addEventListener('click', this.onAdContainerClick.bind(this), false);
+    this.createControls();
+    this.controller.injectAdContainerDiv(this.adContainerDiv);
+  }
 };
 
 /**
  * Create the controls.
  */
 AdUi.prototype.createControls = function () {
+  var _this2 = this;
+
   this.assignControlAttributes(this.controlsDiv, 'ima-controls-div');
   this.controlsDiv.style.width = '100%';
 
-  if (!this.controller.getIsMobile()) {
-    this.assignControlAttributes(this.countdownDiv, 'ima-countdown-div');
-    this.countdownDiv.innerHTML = this.controller.getSettings().adLabel;
-    this.countdownDiv.style.display = this.showCountdown ? 'block' : 'none';
+  if (this.vnode.playPauseDiv) {
+    if (this.controller.getIsMobile()) {
+      this.countdownDiv.style.display = 'none';
+    }
   } else {
-    this.countdownDiv.style.display = 'none';
+    if (!this.controller.getIsMobile()) {
+      this.assignControlAttributes(this.countdownDiv, 'ima-countdown-div');
+      this.countdownDiv.innerHTML = this.controller.getSettings().adLabel;
+      this.countdownDiv.style.display = this.showCountdown ? 'block' : 'none';
+    } else {
+      this.countdownDiv.style.display = 'none';
+    }
   }
 
   this.assignControlAttributes(this.seekBarDiv, 'ima-seek-bar-div');
@@ -765,37 +797,68 @@ AdUi.prototype.createControls = function () {
 
   this.assignControlAttributes(this.progressDiv, 'ima-progress-div');
 
-  this.assignControlAttributes(this.playPauseDiv, 'ima-play-pause-div');
-  this.addClass(this.playPauseDiv, 'ima-playing');
-  this.playPauseDiv.addEventListener('click', this.onAdPlayPauseClick.bind(this), false);
-
-  this.assignControlAttributes(this.muteDiv, 'ima-mute-div');
-  this.addClass(this.muteDiv, 'ima-non-muted');
-  this.muteDiv.addEventListener('click', this.onAdMuteClick.bind(this), false);
-
-  this.assignControlAttributes(this.sliderDiv, 'ima-slider-div');
-  this.sliderDiv.addEventListener('mousedown', this.onAdVolumeSliderMouseDown.bind(this), false);
-
-  // Hide volume slider controls on iOS as they aren't supported.
-  if (this.controller.getIsIos()) {
-    this.sliderDiv.style.display = 'none';
+  if (this.vnode.playPauseDiv) {
+    this.vnode.playPauseDiv.$on('click', function () {
+      _this2.onAdPlayPauseClick();
+    });
+  } else {
+    this.assignControlAttributes(this.playPauseDiv, 'ima-play-pause-div');
+    this.addClass(this.playPauseDiv, 'ima-playing');
+    this.playPauseDiv.addEventListener('click', this.onAdPlayPauseClick.bind(this), false);
   }
 
-  this.assignControlAttributes(this.sliderLevelDiv, 'ima-slider-level-div');
+  if (this.vnode.muteDiv) {
+    this.vnode.muteDiv.$on('click', function () {
+      _this2.onAdMuteClick();
+    });
+  } else {
+    this.assignControlAttributes(this.muteDiv, 'ima-mute-div');
+    this.addClass(this.muteDiv, 'ima-non-muted');
+    this.muteDiv.addEventListener('click', this.onAdMuteClick.bind(this), false);
+  }
 
-  this.assignControlAttributes(this.fullscreenDiv, 'ima-fullscreen-div');
-  this.addClass(this.fullscreenDiv, 'ima-non-fullscreen');
-  this.fullscreenDiv.addEventListener('click', this.onAdFullscreenClick.bind(this), false);
+  if (this.vnode.sliderDiv) {
+    this.vnode.adControl.$on('changeVolume', function (value) {
+      _this2.onPlayerVolumeChanged(value);
+    });
+    this.vnode.adControl.$on('update:volume', function (value) {
+      _this2.changeVolume(value);
+    });
+    if (this.controller.getIsIos()) {
+      this.sliderDiv.style.display = 'none';
+    }
+  } else {
+    this.assignControlAttributes(this.sliderDiv, 'ima-slider-div');
+    this.sliderDiv.addEventListener('mousedown', this.onAdVolumeSliderMouseDown.bind(this), false);
 
-  this.adContainerDiv.appendChild(this.controlsDiv);
-  this.controlsDiv.appendChild(this.countdownDiv);
-  this.controlsDiv.appendChild(this.seekBarDiv);
-  this.controlsDiv.appendChild(this.playPauseDiv);
-  this.controlsDiv.appendChild(this.muteDiv);
-  this.controlsDiv.appendChild(this.sliderDiv);
-  this.controlsDiv.appendChild(this.fullscreenDiv);
-  this.seekBarDiv.appendChild(this.progressDiv);
-  this.sliderDiv.appendChild(this.sliderLevelDiv);
+    // Hide volume slider controls on iOS as they aren't supported.
+    if (this.controller.getIsIos()) {
+      this.sliderDiv.style.display = 'none';
+    }
+
+    this.assignControlAttributes(this.sliderLevelDiv, 'ima-slider-level-div');
+  }
+
+  if (this.vnode.fullscreenDiv) {
+    this.vnode.fullscreenDiv.$on('click', function () {
+      _this2.onAdFullscreenClick();
+    });
+  } else {
+    this.assignControlAttributes(this.fullscreenDiv, 'ima-fullscreen-div');
+    this.addClass(this.fullscreenDiv, 'ima-non-fullscreen');
+    this.fullscreenDiv.addEventListener('click', this.onAdFullscreenClick.bind(this), false);
+  }
+  if (!this.vnode.adControl) {
+    this.adContainerDiv.appendChild(this.controlsDiv);
+    this.controlsDiv.appendChild(this.countdownDiv);
+    this.controlsDiv.appendChild(this.seekBarDiv);
+    this.controlsDiv.appendChild(this.playPauseDiv);
+    this.controlsDiv.appendChild(this.muteDiv);
+    this.controlsDiv.appendChild(this.sliderDiv);
+    this.controlsDiv.appendChild(this.fullscreenDiv);
+    this.seekBarDiv.appendChild(this.progressDiv);
+    this.sliderDiv.appendChild(this.sliderLevelDiv);
+  }
 };
 
 /**
@@ -823,6 +886,10 @@ AdUi.prototype.onAdFullscreenClick = function () {
  * Show pause and hide play button
  */
 AdUi.prototype.onAdsPaused = function () {
+  if (this.vnode.muteDiv && this.vnode.adControl) {
+    this.vnode.adControl.$props.playing = false;
+    return;
+  }
   this.controller.sdkImpl.adPlaying = false;
   this.addClass(this.playPauseDiv, 'ima-paused');
   this.removeClass(this.playPauseDiv, 'ima-playing');
@@ -841,6 +908,10 @@ AdUi.prototype.onAdsResumed = function () {
  * Show play and hide pause button
  */
 AdUi.prototype.onAdsPlaying = function () {
+  if (this.vnode.muteDiv && this.vnode.adControl) {
+    this.vnode.adControl.$props.playing = true;
+    return;
+  }
   this.controller.sdkImpl.adPlaying = true;
   this.addClass(this.playPauseDiv, 'ima-playing');
   this.removeClass(this.playPauseDiv, 'ima-paused');
@@ -878,6 +949,11 @@ AdUi.prototype.updateAdUi = function (currentTime, remainingTime, duration, adPo
  * Handles UI changes when the ad is unmuted.
  */
 AdUi.prototype.unmute = function () {
+  if (this.vnode.adControl) {
+    this.vnode.adControl.$props.muted = false;
+    this.vnode.adControl.$props.volume = this.controller.getPlayerVolume();
+    return;
+  }
   this.addClass(this.muteDiv, 'ima-non-muted');
   this.removeClass(this.muteDiv, 'ima-muted');
   this.sliderLevelDiv.style.width = this.controller.getPlayerVolume() * 100 + '%';
@@ -887,6 +963,11 @@ AdUi.prototype.unmute = function () {
  * Handles UI changes when the ad is muted.
  */
 AdUi.prototype.mute = function () {
+  if (this.vnode.adControl) {
+    this.vnode.adControl.$props.muted = true;
+    this.vnode.adControl.$props.volume = 0;
+    return;
+  }
   this.addClass(this.muteDiv, 'ima-muted');
   this.removeClass(this.muteDiv, 'ima-non-muted');
   this.sliderLevelDiv.style.width = '0%';
@@ -920,6 +1001,12 @@ AdUi.prototype.onMouseUp = function (event) {
  * Utility function to set volume and associated UI
  */
 AdUi.prototype.changeVolume = function (event) {
+  if (this.vnode.adControl) {
+    this.vnode.adControl.$props.muted = event == 0;
+    this.vnode.adControl.$props.volume = event;
+    this.controller.setVolume(event);
+    return;
+  }
   var percent = (event.clientX - this.sliderDiv.getBoundingClientRect().left) / this.sliderDiv.offsetWidth;
   percent *= 100;
   // Bounds value 0-100 if mouse is outside slider region.
@@ -1034,11 +1121,19 @@ AdUi.prototype.onNonLinearAdLoad = function () {
 };
 
 AdUi.prototype.onPlayerEnterFullscreen = function () {
+  if (this.vnode.adControl) {
+    this.vnode.adControl.$props.fullscreen = true;
+    return;
+  }
   this.addClass(this.fullscreenDiv, 'ima-fullscreen');
   this.removeClass(this.fullscreenDiv, 'ima-non-fullscreen');
 };
 
 AdUi.prototype.onPlayerExitFullscreen = function () {
+  if (this.vnode.adControl) {
+    this.vnode.adControl.$props.fullscreen = false;
+    return;
+  }
   this.addClass(this.fullscreenDiv, 'ima-non-fullscreen');
   this.removeClass(this.fullscreenDiv, 'ima-fullscreen');
 };
@@ -1049,6 +1144,11 @@ AdUi.prototype.onPlayerExitFullscreen = function () {
  * @param {number} volume The new player volume.
  */
 AdUi.prototype.onPlayerVolumeChanged = function (volume) {
+  if (this.vnode.adControl) {
+    this.vnode.adControl.$props.muted = volume == 0;
+    this.vnode.adControl.$props.volume = volume;
+    return;
+  }
   if (volume == 0) {
     this.addClass(this.muteDiv, 'ima-muted');
     this.removeClass(this.muteDiv, 'ima-non-muted');
@@ -1166,7 +1266,7 @@ var repository = { "type": "git", "url": "https://github.com/googleads/videojs-i
 var files = ["CHANGELOG.md", "LICENSE", "README.md", "dist/", "src/"];
 var peerDependencies = { "video.js": "^5.19.2 || ^6 || ^7" };
 var dependencies = { "can-autoplay": "^3.0.0", "cryptiles": "^4.1.3", "extend": ">=3.0.2", "lodash": ">=4.17.19", "lodash.template": ">=4.5.0", "videojs-contrib-ads": "^6.6.5" };
-var devDependencies = { "axios": ">=0.21.1", "babel-core": "^6.26.3", "babel-preset-env": "^1.7.0", "child_process": "^1.0.2", "chromedriver": "^87.0.5", "conventional-changelog-cli": "^2.0.31", "conventional-changelog-videojs": "^3.0.1", "ecstatic": ">=4.1.3", "eslint": "^4.19.1", "eslint-config-google": "^0.9.1", "eslint-plugin-jsdoc": "^3.15.1", "geckodriver": "^1.19.1", "http-server": "^0.12.3", "ini": ">=1.3.7", "mocha": "^7.1.2", "npm-run-all": "^4.1.5", "path": "^0.12.7", "protractor": "^7.0.0", "rimraf": "^2.7.1", "rollup": "^0.51.8", "rollup-plugin-babel": "^3.0.7", "rollup-plugin-copy": "^0.2.3", "rollup-plugin-json": "^2.3.1", "rollup-plugin-uglify": "^2.0.1", "selenium-webdriver": "^3.6.0", "uglify-es": "^3.3.9", "video.js": "^5.19.2 || ^6 || ^7", "watch": "^1.0.2", "webdriver-manager": "^12.1.7" };
+var devDependencies = { "axios": ">=0.21.1", "babel-core": "^6.26.3", "babel-preset-env": "^1.7.0", "child_process": "^1.0.2", "chromedriver": "^87.0.5", "conventional-changelog-cli": "^2.0.31", "conventional-changelog-videojs": "^3.0.1", "ecstatic": ">=4.1.3", "eslint": "^4.19.1", "eslint-config-google": "^0.9.1", "eslint-config-prettier": "^8.1.0", "eslint-plugin-jsdoc": "^3.15.1", "eslint-plugin-prettier": "^3.3.1", "geckodriver": "^1.19.1", "http-server": "^0.12.3", "ini": ">=1.3.7", "mocha": "^7.1.2", "npm-run-all": "^4.1.5", "path": "^0.12.7", "prettier": "^2.2.1", "protractor": "^7.0.0", "rimraf": "^2.7.1", "rollup": "^0.51.8", "rollup-plugin-babel": "^3.0.7", "rollup-plugin-copy": "^0.2.3", "rollup-plugin-json": "^2.3.1", "rollup-plugin-uglify": "^2.0.1", "selenium-webdriver": "^3.6.0", "uglify-es": "^3.3.9", "video.js": "^7.11.4", "watch": "^1.0.2", "webdriver-manager": "^12.1.7" };
 var keywords = ["videojs", "videojs-plugin"];
 var pkg = {
 	name: name,
@@ -1305,12 +1405,11 @@ var SdkImpl = function SdkImpl(controller) {
   this.adsManagerDimensions = {
     width: 0,
     height: 0
-  };
 
-  /**
-   * Boolean flag to enable manual ad break playback.
-   */
-  this.autoPlayAdBreaks = true;
+    /**
+     * Boolean flag to enable manual ad break playback.
+     */
+  };this.autoPlayAdBreaks = true;
   if (this.controller.getSettings().autoPlayAdBreaks === false) {
     this.autoPlayAdBreaks = false;
   }
@@ -1360,7 +1459,6 @@ SdkImpl.prototype.initAdObjects = function () {
   this.adsLoader.getSettings().setPlayerType('videojs-ima');
   this.adsLoader.getSettings().setPlayerVersion(pkg.version);
   this.adsLoader.getSettings().setAutoPlayAdBreaks(this.autoPlayAdBreaks);
-
   this.adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, this.onAdsManagerLoaded.bind(this), false);
   this.adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdsLoaderError.bind(this), false);
 
@@ -1423,6 +1521,7 @@ SdkImpl.prototype.onAdsManagerLoaded = function (adsManagerLoadedEvent) {
   this.createAdsRenderingSettings();
 
   this.adsManager = adsManagerLoadedEvent.getAdsManager(this.controller.getContentPlayheadTracker(), this.adsRenderingSettings);
+  console.log(this.adsManager);
 
   this.adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError.bind(this));
   this.adsManager.addEventListener(google.ima.AdEvent.Type.AD_BREAK_READY, this.onAdBreakReady.bind(this));
@@ -1498,6 +1597,7 @@ SdkImpl.prototype.initAdsManager = function () {
 SdkImpl.prototype.createAdsRenderingSettings = function () {
   this.adsRenderingSettings = new google.ima.AdsRenderingSettings();
   this.adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
+  console.log(this.controller.getSettings().adsRenderingSettings);
   if (this.controller.getSettings().adsRenderingSettings) {
     for (var setting in this.controller.getSettings().adsRenderingSettings) {
       if (setting !== '') {
@@ -1984,14 +2084,13 @@ Controller.IMA_DEFAULTS = {
   requestMode: 'onLoad',
   showControlsForJSAds: true,
   timeout: 5000
-};
 
-/**
- * Extends the settings to include user-provided settings.
- *
- * @param {Object} options Options to be used in initialization.
- */
-Controller.prototype.initWithSettings = function (options) {
+  /**
+   * Extends the settings to include user-provided settings.
+   *
+   * @param {Object} options Options to be used in initialization.
+   */
+};Controller.prototype.initWithSettings = function (options) {
   this.settings = this.extend({}, Controller.IMA_DEFAULTS, options || {});
 
   this.warnAboutDeprecatedSettings();

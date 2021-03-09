@@ -188,7 +188,6 @@ SdkImpl.prototype.initAdObjects = function() {
   this.adsLoader.getSettings().setPlayerType('videojs-ima')
   this.adsLoader.getSettings().setPlayerVersion(pkg.version)
   this.adsLoader.getSettings().setAutoPlayAdBreaks(this.autoPlayAdBreaks)
-
   this.adsLoader.addEventListener(
     google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
     this.onAdsManagerLoaded.bind(this),
@@ -266,6 +265,7 @@ SdkImpl.prototype.onAdsManagerLoaded = function(adsManagerLoadedEvent) {
     this.controller.getContentPlayheadTracker(),
     this.adsRenderingSettings
   )
+  console.log(this.adsManager)
 
   this.adsManager.addEventListener(
     google.ima.AdErrorEvent.Type.AD_ERROR,
@@ -376,6 +376,7 @@ SdkImpl.prototype.initAdsManager = function() {
 SdkImpl.prototype.createAdsRenderingSettings = function() {
   this.adsRenderingSettings = new google.ima.AdsRenderingSettings()
   this.adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true
+  console.log(this.controller.getSettings().adsRenderingSettings)
   if (this.controller.getSettings().adsRenderingSettings) {
     for (let setting in this.controller.getSettings().adsRenderingSettings) {
       if (setting !== '') {
