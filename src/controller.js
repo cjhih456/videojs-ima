@@ -24,8 +24,8 @@ import SdkImpl from './sdk-impl.js'
  * The grand coordinator of the plugin. Facilitates communication between all
  * other plugin classes.
  *
- * @param {Object} player Instance of the video.js player.
- * @param {Object} options Options provided by the implementation.
+ * @param {object} player Instance of the video.js player.
+ * @param {object} options Options provided by the implementation.
  * @constructor
  * @struct
  * @final
@@ -33,7 +33,7 @@ import SdkImpl from './sdk-impl.js'
 const Controller = function(player, options) {
   /**
    * Stores user-provided settings.
-   * @type {Object}
+   * @type {object}
    */
   this.settings = {}
 
@@ -97,7 +97,7 @@ Controller.IMA_DEFAULTS = {
 /**
  * Extends the settings to include user-provided settings.
  *
- * @param {Object} options Options to be used in initialization.
+ * @param {object} options Options to be used in initialization.
  */
 Controller.prototype.initWithSettings = function(options) {
   this.settings = this.extend({}, Controller.IMA_DEFAULTS, options || {})
@@ -131,7 +131,7 @@ Controller.prototype.warnAboutDeprecatedSettings = function() {
 /**
  * Return the settings object.
  *
- * @return {Object} The settings object.
+ * @return {object} The settings object.
  */
 Controller.prototype.getSettings = function() {
   return this.settings
@@ -172,7 +172,7 @@ Controller.prototype.getAdContainerDiv = function() {
 }
 
 /**
- * @return {Object} The content player.
+ * @return {object} The content player.
  */
 Controller.prototype.getContentPlayer = function() {
   return this.playerWrapper.getContentPlayer()
@@ -181,7 +181,7 @@ Controller.prototype.getContentPlayer = function() {
 /**
  * Returns the content playhead tracker.
  *
- * @return {Object} The content playhead tracker.
+ * @return {object} The content playhead tracker.
  */
 Controller.prototype.getContentPlayheadTracker = function() {
   return this.playerWrapper.getContentPlayheadTracker()
@@ -198,7 +198,7 @@ Controller.prototype.requestAds = function() {
  * Add or modify a setting.
  *
  * @param {string} key Key to modify
- * @param {Object} value Value to set at key.
+ * @param {object} value Value to set at key.
  */
 Controller.prototype.setSetting = function(key, value) {
   this.settings[key] = value
@@ -207,7 +207,7 @@ Controller.prototype.setSetting = function(key, value) {
 /**
  * Called when there is an error loading ads.
  *
- * @param {Object} adErrorEvent The ad error event thrown by the IMA SDK.
+ * @param {object} adErrorEvent The ad error event thrown by the IMA SDK.
  */
 Controller.prototype.onErrorLoadingAds = function(adErrorEvent) {
   this.adUi.onAdError()
@@ -270,7 +270,7 @@ Controller.prototype.toggleFullscreen = function() {
 /**
  * Relays ad errors to the player wrapper.
  *
- * @param {Object} adErrorEvent The ad error event thrown by the IMA SDK.
+ * @param {object} adErrorEvent The ad error event thrown by the IMA SDK.
  */
 Controller.prototype.onAdError = function(adErrorEvent) {
   this.adUi.onAdError()
@@ -280,7 +280,7 @@ Controller.prototype.onAdError = function(adErrorEvent) {
 /**
  * Handles ad break starting.
  *
- * @param {Object} adEvent The event fired by the IMA SDK.
+ * @param {object} adEvent The event fired by the IMA SDK.
  */
 Controller.prototype.onAdBreakStart = function(adEvent) {
   this.playerWrapper.onAdBreakStart()
@@ -325,6 +325,14 @@ Controller.prototype.onAdsResumed = function() {
 }
 
 /**
+ * Handles the SDK firing an ad skip event
+ */
+Controller.prototype.onAdsCompleted = function() {
+  this.adUi.onAdsCompleted()
+  this.playerWrapper.onAdsCompleted()
+}
+
+/**
  * Takes data from the sdk impl and passes it to the ad UI to update the UI.
  *
  * @param {number} currentTime Current time of the ad.
@@ -358,7 +366,7 @@ Controller.prototype.onAdLog = function(adEvent) {
 }
 
 /**
- * @return {Object} The current ad.
+ * @return {object} The current ad.
  */
 Controller.prototype.getCurrentAd = function() {
   return this.sdkImpl.getCurrentAd()
@@ -448,7 +456,7 @@ Controller.prototype.onNoPostroll = function() {
  * Called when content and all ads have completed.
  */
 Controller.prototype.onContentAndAdsCompleted = function() {
-  for (let index in this.contentAndAdsEndedListeners) {
+  for (const index in this.contentAndAdsEndedListeners) {
     if (typeof this.contentAndAdsEndedListeners[index] === 'function') {
       this.contentAndAdsEndedListeners[index]()
     }
@@ -539,9 +547,9 @@ Controller.prototype.setContentWithAdsResponse = function(
   adsResponse
 ) {
   this.reset()
-  this.settings.adsResponse = adsResponse
-    ? adsResponse
-    : this.settings.adsResponse
+  this.settings.adsResponse = adsResponse ?
+    adsResponse :
+    this.settings.adsResponse
   this.playerWrapper.changeSource(contentSrc)
 }
 
@@ -551,7 +559,7 @@ Controller.prototype.setContentWithAdsResponse = function(
  * used when the video content is loaded.
  * @param {?string} contentSrc The URI for the content to be played. Leave
  *     blank to use the existing content.
- * @param {?Object} adsRequest The ads request to be requested when the
+ * @param {?object} adsRequest The ads request to be requested when the
  *     content loads. Leave blank to use the existing ads request.
  */
 Controller.prototype.setContentWithAdsRequest = function(
@@ -734,7 +742,7 @@ Controller.prototype.adsWillPlayMuted = function() {
 /**
  * Triggers an event on the VJS player
  * @param  {string} name The event name.
- * @param  {Object} data The event data.
+ * @param  {object} data The event data.
  */
 Controller.prototype.triggerPlayerEvent = function(name, data) {
   this.playerWrapper.triggerPlayerEvent(name, data)
@@ -743,11 +751,11 @@ Controller.prototype.triggerPlayerEvent = function(name, data) {
 /**
  * Extends an object to include the contents of objects at parameters 2 onward.
  *
- * @param {Object} obj The object onto which the subsequent objects' parameters
+ * @param {object} obj The object onto which the subsequent objects' parameters
  *     will be extended. This object will be modified.
- * @param {...Object} var_args The objects whose properties are to be extended
+ * @param {...object} var_args The objects whose properties are to be extended
  *     onto obj.
- * @return {Object} The extended object.
+ * @return {object} The extended object.
  */
 Controller.prototype.extend = function(obj, ...args) {
   let arg

@@ -121,7 +121,7 @@ const AdUi = function(controller) {
 }
 
 AdUi.prototype.getVNodeElement = function(el) {
-  if(el && el.$el instanceof Element) {
+  if (el && el.$el instanceof Element) {
     return el.$el
   } else if (el instanceof Element) {
     return el
@@ -132,7 +132,7 @@ AdUi.prototype.getVNodeElement = function(el) {
  * Creates the ad container.
  */
 AdUi.prototype.createAdContainer = function() {
-  if(this.vnode) {
+  if (this.vnode) {
     this.vnode.adControl.$on('mouseenter', () => {
       this.showAdControls()
     })
@@ -175,8 +175,8 @@ AdUi.prototype.createControls = function() {
   this.assignControlAttributes(this.controlsDiv, 'ima-controls-div')
   this.controlsDiv.style.width = '100%'
 
-  if(this.vnode.playPauseDiv) {
-    if(this.controller.getIsMobile()) {
+  if (this.vnode.playPauseDiv) {
+    if (this.controller.getIsMobile()) {
       this.countdownDiv.style.display = 'none'
     }
   } else {
@@ -194,8 +194,10 @@ AdUi.prototype.createControls = function() {
 
   this.assignControlAttributes(this.progressDiv, 'ima-progress-div')
 
-  if(this.vnode.playPauseDiv) {
-    this.vnode.playPauseDiv.$on('click', () => {this.onAdPlayPauseClick()})
+  if (this.vnode.playPauseDiv) {
+    this.vnode.playPauseDiv.$on('click', () => {
+      this.onAdPlayPauseClick()
+    })
   } else {
     this.assignControlAttributes(this.playPauseDiv, 'ima-play-pause-div')
     this.addClass(this.playPauseDiv, 'ima-playing')
@@ -206,7 +208,7 @@ AdUi.prototype.createControls = function() {
     )
   }
 
-  if(this.vnode.muteDiv) {
+  if (this.vnode.muteDiv) {
     this.vnode.muteDiv.$on('click', () => {
       this.onAdMuteClick()
     })
@@ -216,11 +218,13 @@ AdUi.prototype.createControls = function() {
     this.muteDiv.addEventListener('click', this.onAdMuteClick.bind(this), false)
   }
 
-  if(this.vnode.sliderDiv) {
-    this.vnode.adControl.$on('changeVolume', (value) => {
+  if (this.vnode.sliderDiv) {
+    this.vnode.adControl.$on('changeVolume', value => {
       this.onPlayerVolumeChanged(value)
     })
-    this.vnode.adControl.$on('update:volume', (value) => { this.changeVolume(value) })
+    this.vnode.adControl.$on('update:volume', value => {
+      this.changeVolume(value)
+    })
     if (this.controller.getIsIos()) {
       this.sliderDiv.style.display = 'none'
     }
@@ -240,7 +244,7 @@ AdUi.prototype.createControls = function() {
     this.assignControlAttributes(this.sliderLevelDiv, 'ima-slider-level-div')
   }
 
-  if(this.vnode.fullscreenDiv) {
+  if (this.vnode.fullscreenDiv) {
     this.vnode.fullscreenDiv.$on('click', () => {
       this.onAdFullscreenClick()
     })
@@ -253,7 +257,7 @@ AdUi.prototype.createControls = function() {
       false
     )
   }
-  if(!this.vnode.adControl) {
+  if (!this.vnode.adControl) {
     this.adContainerDiv.appendChild(this.controlsDiv)
     this.controlsDiv.appendChild(this.countdownDiv)
     this.controlsDiv.appendChild(this.seekBarDiv)
@@ -291,7 +295,7 @@ AdUi.prototype.onAdFullscreenClick = function() {
  * Show pause and hide play button
  */
 AdUi.prototype.onAdsPaused = function() {
-  if(this.vnode.muteDiv && this.vnode.adControl) {
+  if (this.vnode.muteDiv && this.vnode.adControl) {
     this.vnode.adControl.$props.playing = false
     return
   }
@@ -309,11 +313,15 @@ AdUi.prototype.onAdsResumed = function() {
   this.showAdControls()
 }
 
+AdUi.prototype.onAdsCompleted = function() {
+  this.hideAdControls()
+}
+
 /**
  * Show play and hide pause button
  */
 AdUi.prototype.onAdsPlaying = function() {
-  if(this.vnode.muteDiv && this.vnode.adControl) {
+  if (this.vnode.muteDiv && this.vnode.adControl) {
     this.vnode.adControl.$props.playing = true
     return
   }
@@ -372,14 +380,14 @@ AdUi.prototype.updateAdUi = function(
  * Handles UI changes when the ad is unmuted.
  */
 AdUi.prototype.unmute = function() {
-  if(this.vnode.adControl) {
+  if (this.vnode.adControl) {
     this.vnode.adControl.$props.muted = false
     this.vnode.adControl.$props.volume = this.controller.getPlayerVolume()
     return
   }
-    this.addClass(this.muteDiv, 'ima-non-muted')
-    this.removeClass(this.muteDiv, 'ima-muted')
-    this.sliderLevelDiv.style.width =
+  this.addClass(this.muteDiv, 'ima-non-muted')
+  this.removeClass(this.muteDiv, 'ima-muted')
+  this.sliderLevelDiv.style.width =
     this.controller.getPlayerVolume() * 100 + '%'
 }
 
@@ -387,14 +395,14 @@ AdUi.prototype.unmute = function() {
  * Handles UI changes when the ad is muted.
  */
 AdUi.prototype.mute = function() {
-  if(this.vnode.adControl) {
+  if (this.vnode.adControl) {
     this.vnode.adControl.$props.muted = true
     this.vnode.adControl.$props.volume = 0
     return
   }
-    this.addClass(this.muteDiv, 'ima-muted')
-    this.removeClass(this.muteDiv, 'ima-non-muted')
-    this.sliderLevelDiv.style.width = '0%'
+  this.addClass(this.muteDiv, 'ima-muted')
+  this.removeClass(this.muteDiv, 'ima-non-muted')
+  this.sliderLevelDiv.style.width = '0%'
 }
 
 /*
@@ -425,7 +433,7 @@ AdUi.prototype.onMouseUp = function(event) {
  * Utility function to set volume and associated UI
  */
 AdUi.prototype.changeVolume = function(event) {
-  if(this.vnode.adControl) {
+  if (this.vnode.adControl) {
     this.vnode.adControl.$props.muted = event == 0
     this.vnode.adControl.$props.volume = event
     this.controller.setVolume(event)
@@ -488,7 +496,7 @@ AdUi.prototype.onAdError = function() {
 /**
  * Handles ad break starting.
  *
- * @param {Object} adEvent The event fired by the IMA SDK.
+ * @param {object} adEvent The event fired by the IMA SDK.
  */
 AdUi.prototype.onAdBreakStart = function(adEvent) {
   this.showAdContainer()
@@ -552,16 +560,16 @@ AdUi.prototype.onNonLinearAdLoad = function() {
 }
 
 AdUi.prototype.onPlayerEnterFullscreen = function() {
-  if(this.vnode.adControl) {
+  if (this.vnode.adControl) {
     this.vnode.adControl.$props.fullscreen = true
     return
   }
-  this.addClass(this.fullscreenDiv, 'ima-fullscreen')
+  this.addClass(this.fullscreenDiv, 'ima-fullscreen') 
   this.removeClass(this.fullscreenDiv, 'ima-non-fullscreen')
 }
 
 AdUi.prototype.onPlayerExitFullscreen = function() {
-  if(this.vnode.adControl) {
+  if (this.vnode.adControl) {
     this.vnode.adControl.$props.fullscreen = false
     return
   }
@@ -575,7 +583,7 @@ AdUi.prototype.onPlayerExitFullscreen = function() {
  * @param {number} volume The new player volume.
  */
 AdUi.prototype.onPlayerVolumeChanged = function(volume) {
-  if(this.vnode.adControl) {
+  if (this.vnode.adControl) {
     this.vnode.adControl.$props.muted = volume == 0
     this.vnode.adControl.$props.volume = volume
     return

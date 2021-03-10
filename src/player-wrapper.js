@@ -20,8 +20,8 @@
 /**
  * Wraps the video.js player for the plugin.
  *
- * @param {Object} player Video.js player instance.
- * @param {Object} adsPluginSettings Settings for the contrib-ads plugin.
+ * @param {object} player Video.js player instance.
+ * @param {object} adsPluginSettings Settings for the contrib-ads plugin.
  * @param {Controller} controller Reference to the parent controller.
  */
 const PlayerWrapper = function(player, adsPluginSettings, controller) {
@@ -221,7 +221,7 @@ PlayerWrapper.prototype.localContentEndedListener = function() {
     this.controller.onContentComplete()
   }
 
-  for (let index in this.contentEndedListeners) {
+  for (const index in this.contentEndedListeners) {
     if (typeof this.contentEndedListeners[index] === 'function') {
       this.contentEndedListeners[index]()
     }
@@ -262,7 +262,7 @@ PlayerWrapper.prototype.playerDisposedListener = function() {
     this.seekCheckIntervalHandle,
     this.resizeCheckIntervalHandle
   ]
-  for (let index in intervalsToClear) {
+  for (const index in intervalsToClear) {
     if (intervalsToClear[index]) {
       clearInterval(intervalsToClear[index])
     }
@@ -337,7 +337,7 @@ PlayerWrapper.prototype.injectAdContainerDiv = function(adContainerDiv) {
 }
 
 /**
- * @return {Object} The content player.
+ * @return {object} The content player.
  */
 PlayerWrapper.prototype.getContentPlayer = function() {
   return this.h5Player
@@ -427,7 +427,7 @@ PlayerWrapper.prototype.getPlayerHeight = function() {
 }
 
 /**
- * @return {Object} The vjs player's options object.
+ * @return {object} The vjs player's options object.
  */
 PlayerWrapper.prototype.getPlayerOptions = function() {
   return this.vjsPlayer.options_
@@ -455,7 +455,7 @@ PlayerWrapper.prototype.toggleFullscreen = function() {
 /**
  * Returns the content playhead tracker.
  *
- * @return {Object} The content playhead tracker.
+ * @return {object} The content playhead tracker.
  */
 PlayerWrapper.prototype.getContentPlayheadTracker = function() {
   return this.contentPlayheadTracker
@@ -464,7 +464,7 @@ PlayerWrapper.prototype.getContentPlayheadTracker = function() {
 /**
  * Handles ad errors.
  *
- * @param {Object} adErrorEvent The ad error event thrown by the IMA SDK.
+ * @param {object} adErrorEvent The ad error event thrown by the IMA SDK.
  */
 PlayerWrapper.prototype.onAdError = function(adErrorEvent) {
   this.vjsControls.show()
@@ -549,6 +549,13 @@ PlayerWrapper.prototype.onAllAdsCompleted = function() {
 }
 
 /**
+ * Handles when ads have finished playing.
+ */
+PlayerWrapper.prototype.onAdsCompleted = function() {
+  this.vjsPlayer.trigger('adscompleted')
+}
+
+/**
  * Triggers adsready for contrib-ads.
  */
 PlayerWrapper.prototype.onAdsReady = function() {
@@ -584,7 +591,7 @@ PlayerWrapper.prototype.seekContentToZero = function() {
 /**
  * Triggers an event on the VJS player
  * @param  {string} name The event name.
- * @param  {Object} data The event data.
+ * @param  {object} data The event data.
  */
 PlayerWrapper.prototype.triggerPlayerEvent = function(name, data) {
   this.vjsPlayer.trigger(name, data)

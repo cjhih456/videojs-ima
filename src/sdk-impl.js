@@ -260,12 +260,10 @@ SdkImpl.prototype.requestAds = function() {
  */
 SdkImpl.prototype.onAdsManagerLoaded = function(adsManagerLoadedEvent) {
   this.createAdsRenderingSettings()
-
   this.adsManager = adsManagerLoadedEvent.getAdsManager(
     this.controller.getContentPlayheadTracker(),
     this.adsRenderingSettings
   )
-  console.log(this.adsManager)
 
   this.adsManager.addEventListener(
     google.ima.AdErrorEvent.Type.AD_ERROR,
@@ -375,8 +373,11 @@ SdkImpl.prototype.initAdsManager = function() {
  */
 SdkImpl.prototype.createAdsRenderingSettings = function() {
   this.adsRenderingSettings = new google.ima.AdsRenderingSettings()
-  this.adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true
-  console.log(this.controller.getSettings().adsRenderingSettings)
+  this.adsRenderingSettings.append({
+    restoreCustomPlaybackStateOnAdBreakComplete: true,
+    useStyledLinearAds: false,
+    disableUi: true
+  })
   if (this.controller.getSettings().adsRenderingSettings) {
     for (let setting in this.controller.getSettings().adsRenderingSettings) {
       if (setting !== '') {
@@ -500,6 +501,7 @@ SdkImpl.prototype.onAdComplete = function() {
   if (this.currentAd.isLinear()) {
     clearInterval(this.adTrackingTimer)
   }
+  this.controller.onAdsCompleted()
 }
 
 /**

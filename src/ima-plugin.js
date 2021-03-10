@@ -23,9 +23,9 @@ import Controller from './controller.js'
 /**
  * Exposes the ImaPlugin to a publisher implementation.
  *
- * @param {Object} player Instance of the video.js player to which this plugin
+ * @param {object} player Instance of the video.js player to which this plugin
  *     will be added.
- * @param {Object} options Options provided by the implementation.
+ * @param {object} options Options provided by the implementation.
  * @constructor
  * @struct
  * @final
@@ -174,7 +174,7 @@ const ImaPlugin = function(player, options) {
    * used when the video content is loaded.
    * @param {?string} contentSrc The URI for the content to be played. Leave
    *     blank to use the existing content.
-   * @param {?Object} adsRequest The ads request to be requested when the
+   * @param {?object} adsRequest The ads request to be requested when the
    *     content loads. Leave blank to use the existing ads request.
    */
   this.setContentWithAdsRequest = function(contentSrc, adsRequest) {
