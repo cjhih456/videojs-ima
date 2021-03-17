@@ -16,8 +16,11 @@ module.exports = {
     'no-console': ['error', {
       'allow': ['warn', 'error']
     }],
+    "indent": ["error", 2],
+    'operator-linebreak': ["off"],
     'comma-dangle': ["error", "never"],
-    'arrow-parens': ['error', 'as-needed']
+    'arrow-parens': ['error', 'as-needed'],
+    'space-before-function-paren': ['off']
   },
   'plugins': [
     'jsdoc',
