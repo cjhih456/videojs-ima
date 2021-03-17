@@ -23,14 +23,14 @@ import Controller from './controller.js'
 /**
  * Exposes the ImaPlugin to a publisher implementation.
  *
- * @param {object} player Instance of the video.js player to which this plugin
+ * @param {Object} player Instance of the video.js player to which this plugin
  *     will be added.
- * @param {object} options Options provided by the implementation.
+ * @param {Object} options Options provided by the implementation.
  * @constructor
  * @struct
  * @final
  */
-const ImaPlugin = function(player, options) {
+const ImaPlugin = function (player, options) {
   this.controller = new Controller(player, options)
 
   /**
@@ -45,7 +45,7 @@ const ImaPlugin = function(player, options) {
    * @param {listener} listener The listener to be called when content and ads
    *     complete.
    */
-  this.addContentAndAdsEndedListener = function(listener) {
+  this.addContentAndAdsEndedListener = function (listener) {
     this.controller.addContentAndAdsEndedListener(listener)
   }.bind(this)
 
@@ -57,7 +57,7 @@ const ImaPlugin = function(player, options) {
    * @param {listener} listener The listener to be called when content
    *     completes.
    */
-  this.addContentEndedListener = function(listener) {
+  this.addContentEndedListener = function (listener) {
     this.controller.addContentEndedListener(listener)
   }.bind(this)
 
@@ -74,7 +74,7 @@ const ImaPlugin = function(player, options) {
    *     listen.
    * @param {callback} callback The method to call when the event is fired.
    */
-  this.addEventListener = function(event, callback) {
+  this.addEventListener = function (event, callback) {
     this.controller.addEventListener(event, callback)
   }.bind(this)
 
@@ -84,7 +84,7 @@ const ImaPlugin = function(player, options) {
    * @param {?string} adTag The ad tag to be requested the next time requestAds
    *     is called.
    */
-  this.changeAdTag = function(adTag) {
+  this.changeAdTag = function (adTag) {
     this.controller.changeAdTag(adTag)
   }.bind(this)
 
@@ -92,7 +92,7 @@ const ImaPlugin = function(player, options) {
    * Returns the instance of the AdsManager.
    * @return {google.ima.AdsManager} The AdsManager being used by the plugin.
    */
-  this.getAdsManager = function() {
+  this.getAdsManager = function () {
     return this.controller.getAdsManager()
   }.bind(this)
 
@@ -100,14 +100,14 @@ const ImaPlugin = function(player, options) {
    * Initializes the AdDisplayContainer. On mobile, this must be done as a
    * result of user action.
    */
-  this.initializeAdDisplayContainer = function() {
+  this.initializeAdDisplayContainer = function () {
     this.controller.initializeAdDisplayContainer()
   }.bind(this)
 
   /**
    * Pauses the ad.
    */
-  this.pauseAd = function() {
+  this.pauseAd = function () {
     this.controller.pauseAd()
   }.bind(this)
 
@@ -115,21 +115,21 @@ const ImaPlugin = function(player, options) {
    * Called by publishers in manual ad break playback mode to start an ad
    * break.
    */
-  this.playAdBreak = function() {
+  this.playAdBreak = function () {
     this.controller.playAdBreak()
   }.bind(this)
 
   /**
    * Creates the AdsRequest and request ads through the AdsLoader.
    */
-  this.requestAds = function() {
+  this.requestAds = function () {
     this.controller.requestAds()
   }.bind(this)
 
   /**
    * Resumes the ad.
    */
-  this.resumeAd = function() {
+  this.resumeAd = function () {
     this.controller.resumeAd()
   }.bind(this)
 
@@ -138,7 +138,7 @@ const ImaPlugin = function(player, options) {
    * @param {listener} listener The listener to be called to trigger manual ad
    *     break playback.
    */
-  this.setAdBreakReadyListener = function(listener) {
+  this.setAdBreakReadyListener = function (listener) {
     this.controller.setAdBreakReadyListener(listener)
   }.bind(this)
 
@@ -151,7 +151,7 @@ const ImaPlugin = function(player, options) {
    * @param {?string} adTag The ad tag to be requested when the content loads.
    *     Leave blank to use the existing ad tag.
    */
-  this.setContentWithAdTag = function(contentSrc, adTag) {
+  this.setContentWithAdTag = function (contentSrc, adTag) {
     this.controller.setContentWithAdTag(contentSrc, adTag)
   }.bind(this)
 
@@ -164,7 +164,7 @@ const ImaPlugin = function(player, options) {
    * @param {?string} adsResponse The ads response to be requested when the
    *     content loads. Leave blank to use the existing ads response.
    */
-  this.setContentWithAdsResponse = function(contentSrc, adsResponse) {
+  this.setContentWithAdsResponse = function (contentSrc, adsResponse) {
     this.controller.setContentWithAdsResponse(contentSrc, adsResponse)
   }.bind(this)
 
@@ -174,10 +174,10 @@ const ImaPlugin = function(player, options) {
    * used when the video content is loaded.
    * @param {?string} contentSrc The URI for the content to be played. Leave
    *     blank to use the existing content.
-   * @param {?object} adsRequest The ads request to be requested when the
+   * @param {?Object} adsRequest The ads request to be requested when the
    *     content loads. Leave blank to use the existing ads request.
    */
-  this.setContentWithAdsRequest = function(contentSrc, adsRequest) {
+  this.setContentWithAdsRequest = function (contentSrc, adsRequest) {
     this.controller.setContentWithAdsRequest(contentSrc, adsRequest)
   }.bind(this)
 
@@ -186,12 +186,12 @@ const ImaPlugin = function(player, options) {
    *
    * @param {boolean} showCountdownIn Show or hide the countdown timer.
    */
-  this.setShowCountdown = function(showCountdownIn) {
+  this.setShowCountdown = function (showCountdownIn) {
     this.controller.setShowCountdown(showCountdownIn)
   }.bind(this)
 }
 
-const init = function(options) {
+const init = function (options) {
   /* eslint no-invalid-this: 'off' */
   this.ima = new ImaPlugin(this, options)
 }

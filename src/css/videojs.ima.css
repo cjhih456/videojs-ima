@@ -22,6 +22,10 @@
   height: 100%;
 }
 
+.ima-ad-container > div > iframe {
+  display: none;
+}
+
 /* Move overlay if user fast-clicks play button. */
 .video-js.vjs-playing .bumpable-ima-ad-container {
   margin-top: -4em;

@@ -20,11 +20,11 @@
 /**
  * Wraps the video.js player for the plugin.
  *
- * @param {object} player Video.js player instance.
- * @param {object} adsPluginSettings Settings for the contrib-ads plugin.
+ * @param {Object} player Video.js player instance.
+ * @param {Object} adsPluginSettings Settings for the contrib-ads plugin.
  * @param {Controller} controller Reference to the parent controller.
  */
-const PlayerWrapper = function(player, adsPluginSettings, controller) {
+const PlayerWrapper = function (player, adsPluginSettings, controller) {
   /**
    * Instance of the video.js player.
    */
@@ -150,7 +150,7 @@ const PlayerWrapper = function(player, adsPluginSettings, controller) {
 /**
  * Set up the intervals we use on the player.
  */
-PlayerWrapper.prototype.setUpPlayerIntervals = function() {
+PlayerWrapper.prototype.setUpPlayerIntervals = function () {
   this.updateTimeIntervalHandle = setInterval(
     this.updateCurrentTime.bind(this),
     this.updateTimeInterval
@@ -168,7 +168,7 @@ PlayerWrapper.prototype.setUpPlayerIntervals = function() {
 /**
  * Updates the current time of the video
  */
-PlayerWrapper.prototype.updateCurrentTime = function() {
+PlayerWrapper.prototype.updateCurrentTime = function () {
   if (!this.contentPlayheadTracker.seeking) {
     this.contentPlayheadTracker.currentTime = this.vjsPlayer.currentTime()
   }
@@ -182,7 +182,7 @@ PlayerWrapper.prototype.updateCurrentTime = function() {
  * properly implemented on all platforms (e.g. mobile safari), so we have to
  * check ourselves to be sure.
  */
-PlayerWrapper.prototype.checkForSeeking = function() {
+PlayerWrapper.prototype.checkForSeeking = function () {
   const tempCurrentTime = this.vjsPlayer.currentTime()
   const diff =
     (tempCurrentTime - this.contentPlayheadTracker.previousTime) * 1000
@@ -198,7 +198,7 @@ PlayerWrapper.prototype.checkForSeeking = function() {
  * Detects when the player is resized (for fluid support) and resizes the
  * ads manager to match.
  */
-PlayerWrapper.prototype.checkForResize = function() {
+PlayerWrapper.prototype.checkForResize = function () {
   const currentWidth = this.getPlayerWidth()
   const currentHeight = this.getPlayerHeight()
 
@@ -215,7 +215,7 @@ PlayerWrapper.prototype.checkForResize = function() {
 /**
  * Local content ended listener for contentComplete.
  */
-PlayerWrapper.prototype.localContentEndedListener = function() {
+PlayerWrapper.prototype.localContentEndedListener = function () {
   if (!this.contentComplete) {
     this.contentComplete = true
     this.controller.onContentComplete()
@@ -238,14 +238,14 @@ PlayerWrapper.prototype.localContentEndedListener = function() {
 /**
  * Called when it's time to play a post-roll but we don't have one to play.
  */
-PlayerWrapper.prototype.onNoPostroll = function() {
+PlayerWrapper.prototype.onNoPostroll = function () {
   this.vjsPlayer.trigger('nopostroll')
 }
 
 /**
  * Detects when the video.js player has been disposed.
  */
-PlayerWrapper.prototype.playerDisposedListener = function() {
+PlayerWrapper.prototype.playerDisposedListener = function () {
   this.contentEndedListeners = []
   this.controller.onPlayerDisposed()
 
@@ -273,21 +273,21 @@ PlayerWrapper.prototype.playerDisposedListener = function() {
  * Start ad playback, or content video playback in the absence of a
  * pre-roll.
  */
-PlayerWrapper.prototype.onReadyForPreroll = function() {
+PlayerWrapper.prototype.onReadyForPreroll = function () {
   this.controller.onPlayerReadyForPreroll()
 }
 
 /**
  * Detects if the ad has timed out.
  */
-PlayerWrapper.prototype.onAdTimeout = function() {
+PlayerWrapper.prototype.onAdTimeout = function () {
   this.controller.onAdTimeout()
 }
 
 /**
  * Called when the player fires its 'ready' event.
  */
-PlayerWrapper.prototype.onPlayerReady = function() {
+PlayerWrapper.prototype.onPlayerReady = function () {
   this.h5Player = document
     .getElementById(this.getPlayerId())
     .getElementsByClassName('vjs-tech')[0]
@@ -309,7 +309,7 @@ PlayerWrapper.prototype.onPlayerReady = function() {
  * Listens for the video.js player to change its fullscreen status. This
  * keeps the fullscreen-ness of the AdContainer in sync with the player.
  */
-PlayerWrapper.prototype.onFullscreenChange = function() {
+PlayerWrapper.prototype.onFullscreenChange = function () {
   if (this.vjsPlayer.isFullscreen()) {
     this.controller.onPlayerEnterFullscreen()
   } else {
@@ -322,7 +322,7 @@ PlayerWrapper.prototype.onFullscreenChange = function() {
  * volume in sync with the content volume if the volume of the player is
  * changed while content is playing.
  */
-PlayerWrapper.prototype.onVolumeChange = function() {
+PlayerWrapper.prototype.onVolumeChange = function () {
   const newVolume = this.vjsPlayer.muted() ? 0 : this.vjsPlayer.volume()
   this.controller.onPlayerVolumeChanged(newVolume)
 }
@@ -332,21 +332,21 @@ PlayerWrapper.prototype.onVolumeChange = function() {
  *
  * @param{HTMLElement} adContainerDiv The ad container div.
  */
-PlayerWrapper.prototype.injectAdContainerDiv = function(adContainerDiv) {
+PlayerWrapper.prototype.injectAdContainerDiv = function (adContainerDiv) {
   this.vjsControls.el().parentNode.appendChild(adContainerDiv)
 }
 
 /**
- * @return {object} The content player.
+ * @return {Object} The content player.
  */
-PlayerWrapper.prototype.getContentPlayer = function() {
+PlayerWrapper.prototype.getContentPlayer = function () {
   return this.h5Player
 }
 
 /**
  * @return {number} The volume, 0-1.
  */
-PlayerWrapper.prototype.getVolume = function() {
+PlayerWrapper.prototype.getVolume = function () {
   return this.vjsPlayer.muted() ? 0 : this.vjsPlayer.volume()
 }
 
@@ -355,7 +355,7 @@ PlayerWrapper.prototype.getVolume = function() {
  *
  * @param {number} volume The new volume.
  */
-PlayerWrapper.prototype.setVolume = function(volume) {
+PlayerWrapper.prototype.setVolume = function (volume) {
   this.vjsPlayer.volume(volume)
   if (volume == 0) {
     this.vjsPlayer.muted(true)
@@ -367,28 +367,28 @@ PlayerWrapper.prototype.setVolume = function(volume) {
 /**
  * Ummute the player.
  */
-PlayerWrapper.prototype.unmute = function() {
+PlayerWrapper.prototype.unmute = function () {
   this.vjsPlayer.muted(false)
 }
 
 /**
  * Mute the player.
  */
-PlayerWrapper.prototype.mute = function() {
+PlayerWrapper.prototype.mute = function () {
   this.vjsPlayer.muted(true)
 }
 
 /**
  * Play the video.
  */
-PlayerWrapper.prototype.play = function() {
+PlayerWrapper.prototype.play = function () {
   this.vjsPlayer.play()
 }
 
 /**
  * Toggles playback of the video.
  */
-PlayerWrapper.prototype.togglePlayback = function() {
+PlayerWrapper.prototype.togglePlayback = function () {
   if (this.vjsPlayer.paused()) {
     this.vjsPlayer.play()
   } else {
@@ -401,7 +401,7 @@ PlayerWrapper.prototype.togglePlayback = function() {
  *
  * @return {number} The player's width.
  */
-PlayerWrapper.prototype.getPlayerWidth = function() {
+PlayerWrapper.prototype.getPlayerWidth = function () {
   let width = (getComputedStyle(this.vjsPlayer.el()) || {}).width
 
   if (!width || parseFloat(width) === 0) {
@@ -416,7 +416,7 @@ PlayerWrapper.prototype.getPlayerWidth = function() {
  *
  * @return {number} The player's height.
  */
-PlayerWrapper.prototype.getPlayerHeight = function() {
+PlayerWrapper.prototype.getPlayerHeight = function () {
   let height = (getComputedStyle(this.vjsPlayer.el()) || {}).height
 
   if (!height || parseFloat(height) === 0) {
@@ -427,9 +427,9 @@ PlayerWrapper.prototype.getPlayerHeight = function() {
 }
 
 /**
- * @return {object} The vjs player's options object.
+ * @return {Object} The vjs player's options object.
  */
-PlayerWrapper.prototype.getPlayerOptions = function() {
+PlayerWrapper.prototype.getPlayerOptions = function () {
   return this.vjsPlayer.options_
 }
 
@@ -437,14 +437,14 @@ PlayerWrapper.prototype.getPlayerOptions = function() {
  * Returns the instance of the player id.
  * @return {string} The player id.
  */
-PlayerWrapper.prototype.getPlayerId = function() {
+PlayerWrapper.prototype.getPlayerId = function () {
   return this.vjsPlayer.id()
 }
 
 /**
  * Toggle fullscreen state.
  */
-PlayerWrapper.prototype.toggleFullscreen = function() {
+PlayerWrapper.prototype.toggleFullscreen = function () {
   if (this.vjsPlayer.isFullscreen()) {
     this.vjsPlayer.exitFullscreen()
   } else {
@@ -455,18 +455,18 @@ PlayerWrapper.prototype.toggleFullscreen = function() {
 /**
  * Returns the content playhead tracker.
  *
- * @return {object} The content playhead tracker.
+ * @return {Object} The content playhead tracker.
  */
-PlayerWrapper.prototype.getContentPlayheadTracker = function() {
+PlayerWrapper.prototype.getContentPlayheadTracker = function () {
   return this.contentPlayheadTracker
 }
 
 /**
  * Handles ad errors.
  *
- * @param {object} adErrorEvent The ad error event thrown by the IMA SDK.
+ * @param {Object} adErrorEvent The ad error event thrown by the IMA SDK.
  */
-PlayerWrapper.prototype.onAdError = function(adErrorEvent) {
+PlayerWrapper.prototype.onAdError = function (adErrorEvent) {
   this.vjsControls.show()
   const errorMessage =
     adErrorEvent.getError !== undefined
@@ -485,7 +485,7 @@ PlayerWrapper.prototype.onAdError = function(adErrorEvent) {
  * Handles ad log messages.
  * @param {google.ima.AdEvent} adEvent The AdEvent thrown by the IMA SDK.
  */
-PlayerWrapper.prototype.onAdLog = function(adEvent) {
+PlayerWrapper.prototype.onAdLog = function (adEvent) {
   const adData = adEvent.getAdData()
   const errorMessage =
     adData['adError'] !== undefined ? adData['adError'].getMessage() : undefined
@@ -501,7 +501,7 @@ PlayerWrapper.prototype.onAdLog = function(adEvent) {
 /**
  * Handles ad break starting.
  */
-PlayerWrapper.prototype.onAdBreakStart = function() {
+PlayerWrapper.prototype.onAdBreakStart = function () {
   this.contentSource = this.vjsPlayer.currentSrc()
   this.contentSourceType = this.vjsPlayer.currentType()
   this.vjsPlayer.off('contentended', this.boundContentEndedListener)
@@ -513,7 +513,7 @@ PlayerWrapper.prototype.onAdBreakStart = function() {
 /**
  * Handles ad break ending.
  */
-PlayerWrapper.prototype.onAdBreakEnd = function() {
+PlayerWrapper.prototype.onAdBreakEnd = function () {
   this.vjsPlayer.on('contentended', this.boundContentEndedListener)
   if (this.vjsPlayer.ads.inAdBreak()) {
     this.vjsPlayer.ads.endLinearAdMode()
@@ -524,14 +524,14 @@ PlayerWrapper.prototype.onAdBreakEnd = function() {
 /**
  * Handles an individual ad start.
  */
-PlayerWrapper.prototype.onAdStart = function() {
+PlayerWrapper.prototype.onAdStart = function () {
   this.vjsPlayer.trigger('ads-ad-started')
 }
 
 /**
  * Handles when all ads have finished playing.
  */
-PlayerWrapper.prototype.onAllAdsCompleted = function() {
+PlayerWrapper.prototype.onAllAdsCompleted = function () {
   if (this.contentComplete == true) {
     // The null check on this.contentSource was added to fix
     // an error when the post-roll was an empty VAST tag.
@@ -551,14 +551,14 @@ PlayerWrapper.prototype.onAllAdsCompleted = function() {
 /**
  * Handles when ads have finished playing.
  */
-PlayerWrapper.prototype.onAdsCompleted = function() {
+PlayerWrapper.prototype.onAdsCompleted = function () {
   this.vjsPlayer.trigger('adscompleted')
 }
 
 /**
  * Triggers adsready for contrib-ads.
  */
-PlayerWrapper.prototype.onAdsReady = function() {
+PlayerWrapper.prototype.onAdsReady = function () {
   this.vjsPlayer.trigger('adsready')
 }
 
@@ -567,7 +567,7 @@ PlayerWrapper.prototype.onAdsReady = function() {
  * @param {?string} contentSrc The URI for the content to be played. Leave
  *     blank to use the existing content.
  */
-PlayerWrapper.prototype.changeSource = function(contentSrc) {
+PlayerWrapper.prototype.changeSource = function (contentSrc) {
   // Only try to pause the player when initialised with a source already
   if (this.vjsPlayer.currentSrc()) {
     this.vjsPlayer.currentTime(0)
@@ -584,16 +584,16 @@ PlayerWrapper.prototype.changeSource = function(contentSrc) {
  * loadedmetadata event, since seeking is not possible until that event has
  * fired.
  */
-PlayerWrapper.prototype.seekContentToZero = function() {
+PlayerWrapper.prototype.seekContentToZero = function () {
   this.vjsPlayer.currentTime(0)
 }
 
 /**
  * Triggers an event on the VJS player
  * @param  {string} name The event name.
- * @param  {object} data The event data.
+ * @param  {Object} data The event data.
  */
-PlayerWrapper.prototype.triggerPlayerEvent = function(name, data) {
+PlayerWrapper.prototype.triggerPlayerEvent = function (name, data) {
   this.vjsPlayer.trigger(name, data)
 }
 
@@ -611,14 +611,14 @@ PlayerWrapper.prototype.triggerPlayerEvent = function(name, data) {
  * @param {listener} listener The listener to be called when content
  *     completes.
  */
-PlayerWrapper.prototype.addContentEndedListener = function(listener) {
+PlayerWrapper.prototype.addContentEndedListener = function (listener) {
   this.contentEndedListeners.push(listener)
 }
 
 /**
  * Reset the player.
  */
-PlayerWrapper.prototype.reset = function() {
+PlayerWrapper.prototype.reset = function () {
   // Attempts to remove the contentEndedListener before adding it.
   // This is to prevent an error where an erroring video caused multiple
   // contentEndedListeners to be added.

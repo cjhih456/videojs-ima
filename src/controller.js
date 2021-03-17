@@ -24,13 +24,13 @@ import SdkImpl from './sdk-impl.js'
  * The grand coordinator of the plugin. Facilitates communication between all
  * other plugin classes.
  *
- * @param {object} player Instance of the video.js player.
- * @param {object} options Options provided by the implementation.
+ * @param {Object} player Instance of the video.js player.
+ * @param {Object} options Options provided by the implementation.
  * @constructor
  * @struct
  * @final
  */
-const Controller = function(player, options) {
+const Controller = function (player, options) {
   /**
    * Stores user-provided settings.
    * @type {object}
@@ -97,9 +97,9 @@ Controller.IMA_DEFAULTS = {
 /**
  * Extends the settings to include user-provided settings.
  *
- * @param {object} options Options to be used in initialization.
+ * @param {Object} options Options to be used in initialization.
  */
-Controller.prototype.initWithSettings = function(options) {
+Controller.prototype.initWithSettings = function (options) {
   this.settings = this.extend({}, Controller.IMA_DEFAULTS, options || {})
 
   this.warnAboutDeprecatedSettings()
@@ -114,7 +114,7 @@ Controller.prototype.initWithSettings = function(options) {
 /**
  * Logs console warnings when deprecated settings are used.
  */
-Controller.prototype.warnAboutDeprecatedSettings = function() {
+Controller.prototype.warnAboutDeprecatedSettings = function () {
   const deprecatedSettings = [
     'adWillAutoplay',
     'adsWillAutoplay',
@@ -131,9 +131,9 @@ Controller.prototype.warnAboutDeprecatedSettings = function() {
 /**
  * Return the settings object.
  *
- * @return {object} The settings object.
+ * @return {Object} The settings object.
  */
-Controller.prototype.getSettings = function() {
+Controller.prototype.getSettings = function () {
   return this.settings
 }
 
@@ -142,7 +142,7 @@ Controller.prototype.getSettings = function() {
  *
  * @return {boolean} True if running on mobile, false otherwise.
  */
-Controller.prototype.getIsMobile = function() {
+Controller.prototype.getIsMobile = function () {
   return this.isMobile
 }
 
@@ -151,7 +151,7 @@ Controller.prototype.getIsMobile = function() {
  *
  * @return {boolean} True if running on iOS, false otherwise.
  */
-Controller.prototype.getIsIos = function() {
+Controller.prototype.getIsIos = function () {
   return this.isIos
 }
 
@@ -160,37 +160,44 @@ Controller.prototype.getIsIos = function() {
  *
  * @param{HTMLElement} adContainerDiv The ad container div.
  */
-Controller.prototype.injectAdContainerDiv = function(adContainerDiv) {
+Controller.prototype.injectAdContainerDiv = function (adContainerDiv) {
   this.playerWrapper.injectAdContainerDiv(adContainerDiv)
 }
 
 /**
  * @return {HTMLElement} The div for the ad container.
  */
-Controller.prototype.getAdContainerDiv = function() {
+Controller.prototype.getAdContainerDiv = function () {
   return this.adUi.getAdContainerDiv()
 }
 
 /**
- * @return {object} The content player.
+ * @return {HTMLElement} The div for the ad controls.
  */
-Controller.prototype.getContentPlayer = function() {
+Controller.prototype.getControlsDiv = function () {
+  return this.adUi.getControlsDiv()
+}
+
+/**
+ * @return {Object} The content player.
+ */
+Controller.prototype.getContentPlayer = function () {
   return this.playerWrapper.getContentPlayer()
 }
 
 /**
  * Returns the content playhead tracker.
  *
- * @return {object} The content playhead tracker.
+ * @return {Object} The content playhead tracker.
  */
-Controller.prototype.getContentPlayheadTracker = function() {
+Controller.prototype.getContentPlayheadTracker = function () {
   return this.playerWrapper.getContentPlayheadTracker()
 }
 
 /**
  * Requests ads.
  */
-Controller.prototype.requestAds = function() {
+Controller.prototype.requestAds = function () {
   this.sdkImpl.requestAds()
 }
 
@@ -198,18 +205,18 @@ Controller.prototype.requestAds = function() {
  * Add or modify a setting.
  *
  * @param {string} key Key to modify
- * @param {object} value Value to set at key.
+ * @param {Object} value Value to set at key.
  */
-Controller.prototype.setSetting = function(key, value) {
+Controller.prototype.setSetting = function (key, value) {
   this.settings[key] = value
 }
 
 /**
  * Called when there is an error loading ads.
  *
- * @param {object} adErrorEvent The ad error event thrown by the IMA SDK.
+ * @param {Object} adErrorEvent The ad error event thrown by the IMA SDK.
  */
-Controller.prototype.onErrorLoadingAds = function(adErrorEvent) {
+Controller.prototype.onErrorLoadingAds = function (adErrorEvent) {
   this.adUi.onAdError()
   this.playerWrapper.onAdError(adErrorEvent)
 }
@@ -217,7 +224,7 @@ Controller.prototype.onErrorLoadingAds = function(adErrorEvent) {
 /**
  * Called by the ad UI when the play/pause button is clicked.
  */
-Controller.prototype.onAdPlayPauseClick = function() {
+Controller.prototype.onAdPlayPauseClick = function () {
   if (this.sdkImpl.isAdPlaying()) {
     this.adUi.onAdsPaused()
     this.sdkImpl.pauseAds()
@@ -231,7 +238,7 @@ Controller.prototype.onAdPlayPauseClick = function() {
  * Called by the ad UI when the mute button is clicked.
  *
  */
-Controller.prototype.onAdMuteClick = function() {
+Controller.prototype.onAdMuteClick = function () {
   if (this.sdkImpl.isAdMuted()) {
     this.playerWrapper.unmute()
     this.adUi.unmute()
@@ -248,7 +255,7 @@ Controller.prototype.onAdMuteClick = function() {
  *
  * @param {number} volume The new volume.
  */
-Controller.prototype.setVolume = function(volume) {
+Controller.prototype.setVolume = function (volume) {
   this.playerWrapper.setVolume(volume)
   this.sdkImpl.setVolume(volume)
 }
@@ -256,23 +263,23 @@ Controller.prototype.setVolume = function(volume) {
 /**
  * @return {number} The volume of the content player.
  */
-Controller.prototype.getPlayerVolume = function() {
+Controller.prototype.getPlayerVolume = function () {
   return this.playerWrapper.getVolume()
 }
 
 /**
  * Toggle fullscreen state.
  */
-Controller.prototype.toggleFullscreen = function() {
+Controller.prototype.toggleFullscreen = function () {
   this.playerWrapper.toggleFullscreen()
 }
 
 /**
  * Relays ad errors to the player wrapper.
  *
- * @param {object} adErrorEvent The ad error event thrown by the IMA SDK.
+ * @param {Object} adErrorEvent The ad error event thrown by the IMA SDK.
  */
-Controller.prototype.onAdError = function(adErrorEvent) {
+Controller.prototype.onAdError = function (adErrorEvent) {
   this.adUi.onAdError()
   this.playerWrapper.onAdError(adErrorEvent)
 }
@@ -280,9 +287,9 @@ Controller.prototype.onAdError = function(adErrorEvent) {
 /**
  * Handles ad break starting.
  *
- * @param {object} adEvent The event fired by the IMA SDK.
+ * @param {Object} adEvent The event fired by the IMA SDK.
  */
-Controller.prototype.onAdBreakStart = function(adEvent) {
+Controller.prototype.onAdBreakStart = function (adEvent) {
   this.playerWrapper.onAdBreakStart()
   this.adUi.onAdBreakStart(adEvent)
 }
@@ -290,14 +297,14 @@ Controller.prototype.onAdBreakStart = function(adEvent) {
 /**
  * Show the ad container.
  */
-Controller.prototype.showAdContainer = function() {
+Controller.prototype.showAdContainer = function () {
   this.adUi.showAdContainer()
 }
 
 /**
  * Handles ad break ending.
  */
-Controller.prototype.onAdBreakEnd = function() {
+Controller.prototype.onAdBreakEnd = function () {
   this.playerWrapper.onAdBreakEnd()
   this.adUi.onAdBreakEnd()
 }
@@ -305,7 +312,7 @@ Controller.prototype.onAdBreakEnd = function() {
 /**
  * Handles when all ads have finished playing.
  */
-Controller.prototype.onAllAdsCompleted = function() {
+Controller.prototype.onAllAdsCompleted = function () {
   this.adUi.onAllAdsCompleted()
   this.playerWrapper.onAllAdsCompleted()
 }
@@ -313,21 +320,21 @@ Controller.prototype.onAllAdsCompleted = function() {
 /**
  * Handles the SDK firing an ad paused event.
  */
-Controller.prototype.onAdsPaused = function() {
+Controller.prototype.onAdsPaused = function () {
   this.adUi.onAdsPaused()
 }
 
 /**
  * Handles the SDK firing an ad resumed event.
  */
-Controller.prototype.onAdsResumed = function() {
+Controller.prototype.onAdsResumed = function () {
   this.adUi.onAdsResumed()
 }
 
 /**
  * Handles the SDK firing an ad skip event
  */
-Controller.prototype.onAdsCompleted = function() {
+Controller.prototype.onAdsCompleted = function () {
   this.adUi.onAdsCompleted()
   this.playerWrapper.onAdsCompleted()
 }
@@ -338,13 +345,15 @@ Controller.prototype.onAdsCompleted = function() {
  * @param {number} currentTime Current time of the ad.
  * @param {number} remainingTime Remaining time of the ad.
  * @param {number} duration Duration of the ad.
+ * @param {number} skipOffset skip offset.
  * @param {number} adPosition Index of the ad in the pod.
  * @param {number} totalAds Total number of ads in the pod.
  */
-Controller.prototype.onAdPlayheadUpdated = function(
+Controller.prototype.onAdPlayheadUpdated = function (
   currentTime,
   remainingTime,
   duration,
+  skipOffset,
   adPosition,
   totalAds
 ) {
@@ -352,6 +361,7 @@ Controller.prototype.onAdPlayheadUpdated = function(
     currentTime,
     remainingTime,
     duration,
+    skipOffset,
     adPosition,
     totalAds
   )
@@ -361,28 +371,28 @@ Controller.prototype.onAdPlayheadUpdated = function(
  * Handles ad log messages.
  * @param {google.ima.AdEvent} adEvent The AdEvent thrown by the IMA SDK.
  */
-Controller.prototype.onAdLog = function(adEvent) {
+Controller.prototype.onAdLog = function (adEvent) {
   this.playerWrapper.onAdLog(adEvent)
 }
 
 /**
- * @return {object} The current ad.
+ * @return {Object} The current ad.
  */
-Controller.prototype.getCurrentAd = function() {
+Controller.prototype.getCurrentAd = function () {
   return this.sdkImpl.getCurrentAd()
 }
 
 /**
  * Play content.
  */
-Controller.prototype.playContent = function() {
+Controller.prototype.playContent = function () {
   this.playerWrapper.play()
 }
 
 /**
  * Handles when a linear ad starts.
  */
-Controller.prototype.onLinearAdStart = function() {
+Controller.prototype.onLinearAdStart = function () {
   this.adUi.onLinearAdStart()
   this.playerWrapper.onAdStart()
 }
@@ -390,14 +400,14 @@ Controller.prototype.onLinearAdStart = function() {
 /**
  * Handles when a non-linear ad loads.
  */
-Controller.prototype.onNonLinearAdLoad = function() {
+Controller.prototype.onNonLinearAdLoad = function () {
   this.adUi.onNonLinearAdLoad()
 }
 
 /**
  * Handles when a non-linear ad starts.
  */
-Controller.prototype.onNonLinearAdStart = function() {
+Controller.prototype.onNonLinearAdStart = function () {
   this.adUi.onNonLinearAdLoad()
   this.playerWrapper.onAdStart()
 }
@@ -407,7 +417,7 @@ Controller.prototype.onNonLinearAdStart = function() {
  *
  * @return {number} The width of the player.
  */
-Controller.prototype.getPlayerWidth = function() {
+Controller.prototype.getPlayerWidth = function () {
   return this.playerWrapper.getPlayerWidth()
 }
 
@@ -416,14 +426,14 @@ Controller.prototype.getPlayerWidth = function() {
  *
  * @return {number} The height of the player.
  */
-Controller.prototype.getPlayerHeight = function() {
+Controller.prototype.getPlayerHeight = function () {
   return this.playerWrapper.getPlayerHeight()
 }
 
 /**
  * Tells the player wrapper that ads are ready.
  */
-Controller.prototype.onAdsReady = function() {
+Controller.prototype.onAdsReady = function () {
   this.playerWrapper.onAdsReady()
 }
 
@@ -433,14 +443,14 @@ Controller.prototype.onAdsReady = function() {
  * @param {number} width The post-resize width of the player.
  * @param {number} height The post-resize height of the player.
  */
-Controller.prototype.onPlayerResize = function(width, height) {
+Controller.prototype.onPlayerResize = function (width, height) {
   this.sdkImpl.onPlayerResize(width, height)
 }
 
 /**
  * Called by the player wrapper when content completes.
  */
-Controller.prototype.onContentComplete = function() {
+Controller.prototype.onContentComplete = function () {
   this.sdkImpl.onContentComplete()
 }
 
@@ -448,14 +458,14 @@ Controller.prototype.onContentComplete = function() {
  * Called by the player wrapper when it's time to play a post-roll but we don't
  * have one to play.
  */
-Controller.prototype.onNoPostroll = function() {
+Controller.prototype.onNoPostroll = function () {
   this.playerWrapper.onNoPostroll()
 }
 
 /**
  * Called when content and all ads have completed.
  */
-Controller.prototype.onContentAndAdsCompleted = function() {
+Controller.prototype.onContentAndAdsCompleted = function () {
   for (const index in this.contentAndAdsEndedListeners) {
     if (typeof this.contentAndAdsEndedListeners[index] === 'function') {
       this.contentAndAdsEndedListeners[index]()
@@ -466,7 +476,7 @@ Controller.prototype.onContentAndAdsCompleted = function() {
 /**
  * Called when the player is disposed.
  */
-Controller.prototype.onPlayerDisposed = function() {
+Controller.prototype.onPlayerDisposed = function () {
   this.contentAndAdsEndedListeners = []
   this.sdkImpl.onPlayerDisposed()
 }
@@ -474,28 +484,28 @@ Controller.prototype.onPlayerDisposed = function() {
 /**
  * Called when the player is ready to play a pre-roll.
  */
-Controller.prototype.onPlayerReadyForPreroll = function() {
+Controller.prototype.onPlayerReadyForPreroll = function () {
   this.sdkImpl.onPlayerReadyForPreroll()
 }
 
 /**
  * Called if the ad times out.
  */
-Controller.prototype.onAdTimeout = function() {
+Controller.prototype.onAdTimeout = function () {
   this.sdkImpl.onAdTimeout()
 }
 
 /**
  * Called when the player is ready.
  */
-Controller.prototype.onPlayerReady = function() {
+Controller.prototype.onPlayerReady = function () {
   this.sdkImpl.onPlayerReady()
 }
 
 /**
  * Called when the player enters fullscreen.
  */
-Controller.prototype.onPlayerEnterFullscreen = function() {
+Controller.prototype.onPlayerEnterFullscreen = function () {
   this.adUi.onPlayerEnterFullscreen()
   this.sdkImpl.onPlayerEnterFullscreen()
 }
@@ -503,7 +513,7 @@ Controller.prototype.onPlayerEnterFullscreen = function() {
 /**
  * Called when the player exits fullscreen.
  */
-Controller.prototype.onPlayerExitFullscreen = function() {
+Controller.prototype.onPlayerExitFullscreen = function () {
   this.adUi.onPlayerExitFullscreen()
   this.sdkImpl.onPlayerExitFullscreen()
 }
@@ -513,7 +523,7 @@ Controller.prototype.onPlayerExitFullscreen = function() {
  *
  * @param {number} volume The new player volume.
  */
-Controller.prototype.onPlayerVolumeChanged = function(volume) {
+Controller.prototype.onPlayerVolumeChanged = function (volume) {
   this.adUi.onPlayerVolumeChanged(volume)
   this.sdkImpl.onPlayerVolumeChanged(volume)
 }
@@ -527,7 +537,7 @@ Controller.prototype.onPlayerVolumeChanged = function(volume) {
  * @param {?string} adTag The ad tag to be requested when the content loads.
  *     Leave blank to use the existing ad tag.
  */
-Controller.prototype.setContentWithAdTag = function(contentSrc, adTag) {
+Controller.prototype.setContentWithAdTag = function (contentSrc, adTag) {
   this.reset()
   this.settings.adTagUrl = adTag ? adTag : this.settings.adTagUrl
   this.playerWrapper.changeSource(contentSrc)
@@ -542,14 +552,14 @@ Controller.prototype.setContentWithAdTag = function(contentSrc, adTag) {
  * @param {?string} adsResponse The ads response to be requested when the
  *     content loads. Leave blank to use the existing ads response.
  */
-Controller.prototype.setContentWithAdsResponse = function(
+Controller.prototype.setContentWithAdsResponse = function (
   contentSrc,
   adsResponse
 ) {
   this.reset()
-  this.settings.adsResponse = adsResponse ?
-    adsResponse :
-    this.settings.adsResponse
+  this.settings.adsResponse = adsResponse
+    ? adsResponse
+    : this.settings.adsResponse
   this.playerWrapper.changeSource(contentSrc)
 }
 
@@ -559,10 +569,10 @@ Controller.prototype.setContentWithAdsResponse = function(
  * used when the video content is loaded.
  * @param {?string} contentSrc The URI for the content to be played. Leave
  *     blank to use the existing content.
- * @param {?object} adsRequest The ads request to be requested when the
+ * @param {?Object} adsRequest The ads request to be requested when the
  *     content loads. Leave blank to use the existing ads request.
  */
-Controller.prototype.setContentWithAdsRequest = function(
+Controller.prototype.setContentWithAdsRequest = function (
   contentSrc,
   adsRequest
 ) {
@@ -574,7 +584,7 @@ Controller.prototype.setContentWithAdsRequest = function(
 /**
  * Resets the state of the plugin.
  */
-Controller.prototype.reset = function() {
+Controller.prototype.reset = function () {
   this.sdkImpl.reset()
   this.playerWrapper.reset()
   this.adUi.reset()
@@ -594,7 +604,7 @@ Controller.prototype.reset = function() {
  * @param {listener} listener The listener to be called when content
  *     completes.
  */
-Controller.prototype.addContentEndedListener = function(listener) {
+Controller.prototype.addContentEndedListener = function (listener) {
   this.playerWrapper.addContentEndedListener(listener)
 }
 
@@ -604,7 +614,7 @@ Controller.prototype.addContentEndedListener = function(listener) {
  * @param {listener} listener The listener to be called when content and ads
  *     complete.
  */
-Controller.prototype.addContentAndAdsEndedListener = function(listener) {
+Controller.prototype.addContentAndAdsEndedListener = function (listener) {
   this.contentAndAdsEndedListeners.push(listener)
 }
 
@@ -613,7 +623,7 @@ Controller.prototype.addContentAndAdsEndedListener = function(listener) {
  * @param {listener} listener The listener to be called to trigger manual ad
  *     break playback.
  */
-Controller.prototype.setAdBreakReadyListener = function(listener) {
+Controller.prototype.setAdBreakReadyListener = function (listener) {
   this.sdkImpl.setAdBreakReadyListener(listener)
 }
 
@@ -622,7 +632,7 @@ Controller.prototype.setAdBreakReadyListener = function(listener) {
  *
  * @param {boolean} showCountdownIn Show or hide the countdown timer.
  */
-Controller.prototype.setShowCountdown = function(showCountdownIn) {
+Controller.prototype.setShowCountdown = function (showCountdownIn) {
   this.adUi.setShowCountdown(showCountdownIn)
   this.showCountdown = showCountdownIn
   this.adUi.countdownDiv.style.display = this.showCountdown ? 'block' : 'none'
@@ -632,7 +642,7 @@ Controller.prototype.setShowCountdown = function(showCountdownIn) {
  * Initializes the AdDisplayContainer. On mobile, this must be done as a
  * result of user action.
  */
-Controller.prototype.initializeAdDisplayContainer = function() {
+Controller.prototype.initializeAdDisplayContainer = function () {
   this.sdkImpl.initializeAdDisplayContainer()
 }
 
@@ -640,7 +650,7 @@ Controller.prototype.initializeAdDisplayContainer = function() {
  * Called by publishers in manual ad break playback mode to start an ad
  * break.
  */
-Controller.prototype.playAdBreak = function() {
+Controller.prototype.playAdBreak = function () {
   this.sdkImpl.playAdBreak()
 }
 
@@ -657,7 +667,7 @@ Controller.prototype.playAdBreak = function() {
  *     listen.
  * @param {callback} callback The method to call when the event is fired.
  */
-Controller.prototype.addEventListener = function(event, callback) {
+Controller.prototype.addEventListener = function (event, callback) {
   this.sdkImpl.addEventListener(event, callback)
 }
 
@@ -665,7 +675,7 @@ Controller.prototype.addEventListener = function(event, callback) {
  * Returns the instance of the AdsManager.
  * @return {google.ima.AdsManager} The AdsManager being used by the plugin.
  */
-Controller.prototype.getAdsManager = function() {
+Controller.prototype.getAdsManager = function () {
   return this.sdkImpl.getAdsManager()
 }
 
@@ -673,7 +683,7 @@ Controller.prototype.getAdsManager = function() {
  * Returns the instance of the player id.
  * @return {string} The player id.
  */
-Controller.prototype.getPlayerId = function() {
+Controller.prototype.getPlayerId = function () {
   return this.playerWrapper.getPlayerId()
 }
 
@@ -683,7 +693,7 @@ Controller.prototype.getPlayerId = function() {
  * @param {?string} adTag The ad tag to be requested the next time
  *     requestAds is called.
  */
-Controller.prototype.changeAdTag = function(adTag) {
+Controller.prototype.changeAdTag = function (adTag) {
   this.reset()
   this.settings.adTagUrl = adTag
 }
@@ -691,7 +701,7 @@ Controller.prototype.changeAdTag = function(adTag) {
 /**
  * Pauses the ad.
  */
-Controller.prototype.pauseAd = function() {
+Controller.prototype.pauseAd = function () {
   this.adUi.onAdsPaused()
   this.sdkImpl.pauseAds()
 }
@@ -699,7 +709,7 @@ Controller.prototype.pauseAd = function() {
 /**
  * Resumes the ad.
  */
-Controller.prototype.resumeAd = function() {
+Controller.prototype.resumeAd = function () {
   this.adUi.onAdsPlaying()
   this.sdkImpl.resumeAds()
 }
@@ -707,14 +717,14 @@ Controller.prototype.resumeAd = function() {
 /**
  * Toggles video/ad playback.
  */
-Controller.prototype.togglePlayback = function() {
+Controller.prototype.togglePlayback = function () {
   this.playerWrapper.togglePlayback()
 }
 
 /**
  * @return {boolean} true if we expect that ads will autoplay. false otherwise.
  */
-Controller.prototype.adsWillAutoplay = function() {
+Controller.prototype.adsWillAutoplay = function () {
   if (this.settings.adsWillAutoplay !== undefined) {
     return this.settings.adsWillAutoplay
   } else if (this.settings.adWillAutoplay !== undefined) {
@@ -727,7 +737,7 @@ Controller.prototype.adsWillAutoplay = function() {
 /**
  * @return {boolean} true if we expect that ads will autoplay. false otherwise.
  */
-Controller.prototype.adsWillPlayMuted = function() {
+Controller.prototype.adsWillPlayMuted = function () {
   if (this.settings.adsWillPlayMuted !== undefined) {
     return this.settings.adsWillPlayMuted
   } else if (this.settings.adWillPlayMuted !== undefined) {
@@ -742,22 +752,22 @@ Controller.prototype.adsWillPlayMuted = function() {
 /**
  * Triggers an event on the VJS player
  * @param  {string} name The event name.
- * @param  {object} data The event data.
+ * @param  {Object} data The event data.
  */
-Controller.prototype.triggerPlayerEvent = function(name, data) {
+Controller.prototype.triggerPlayerEvent = function (name, data) {
   this.playerWrapper.triggerPlayerEvent(name, data)
 }
 
 /**
  * Extends an object to include the contents of objects at parameters 2 onward.
  *
- * @param {object} obj The object onto which the subsequent objects' parameters
+ * @param {Object} obj The object onto which the subsequent objects' parameters
  *     will be extended. This object will be modified.
- * @param {...object} var_args The objects whose properties are to be extended
+ * @param {...Object} var_args The objects whose properties are to be extended
  *     onto obj.
- * @return {object} The extended object.
+ * @return {Object} The extended object.
  */
-Controller.prototype.extend = function(obj, ...args) {
+Controller.prototype.extend = function (obj, ...args) {
   let arg
   let index
   let key

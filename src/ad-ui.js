@@ -25,7 +25,7 @@
  * @struct
  * @final
  */
-const AdUi = function(controller) {
+const AdUi = function (controller) {
   /**
    * Plugin controller.
    */
@@ -120,7 +120,7 @@ const AdUi = function(controller) {
   this.createAdContainer()
 }
 
-AdUi.prototype.getVNodeElement = function(el) {
+AdUi.prototype.getVNodeElement = function (el) {
   if (el && el.$el instanceof Element) {
     return el.$el
   } else if (el instanceof Element) {
@@ -131,7 +131,7 @@ AdUi.prototype.getVNodeElement = function(el) {
 /**
  * Creates the ad container.
  */
-AdUi.prototype.createAdContainer = function() {
+AdUi.prototype.createAdContainer = function () {
   if (this.vnode) {
     this.vnode.adControl.$on('mouseenter', () => {
       this.showAdControls()
@@ -142,7 +142,7 @@ AdUi.prototype.createAdContainer = function() {
     this.vnode.adControl.$on('click', () => {
       this.onAdContainerClick()
     })
-    this.createControls()
+    this.createControlsWithVnode()
     this.controller.injectAdContainerDiv(this.adContainerDiv)
   } else {
     this.assignControlAttributes(this.adContainerDiv, 'ima-ad-container')
@@ -168,133 +168,125 @@ AdUi.prototype.createAdContainer = function() {
   }
 }
 
+AdUi.prototype.createControlsWithVnode = function () {
+  if (this.controller.getIsMobile()) {
+    this.countdownDiv.style.display = 'none'
+  }
+
+  this.vnode.playPauseDiv.$on('click', () => {
+    this.onAdPlayPauseClick()
+  })
+
+  this.vnode.muteDiv.$on('click', () => {
+    this.onAdMuteClick()
+  })
+
+  this.vnode.adControl.$on('changeVolume', value => {
+    this.onPlayerVolumeChanged(value)
+  })
+  this.vnode.adControl.$on('update:volume', value => {
+    this.changeVolume(value)
+  })
+  if (this.controller.getIsIos()) {
+    this.sliderDiv.style.display = 'none'
+  }
+
+  this.vnode.fullscreenDiv.$on('click', () => {
+    this.onAdFullscreenClick()
+  })
+}
+
 /**
  * Create the controls.
  */
-AdUi.prototype.createControls = function() {
+AdUi.prototype.createControls = function () {
   this.assignControlAttributes(this.controlsDiv, 'ima-controls-div')
   this.controlsDiv.style.width = '100%'
 
-  if (this.vnode.playPauseDiv) {
-    if (this.controller.getIsMobile()) {
-      this.countdownDiv.style.display = 'none'
-    }
+  if (!this.controller.getIsMobile()) {
+    this.assignControlAttributes(this.countdownDiv, 'ima-countdown-div')
+    this.countdownDiv.innerHTML = this.controller.getSettings().adLabel
+    this.countdownDiv.style.display = this.showCountdown ? 'block' : 'none'
   } else {
-    if (!this.controller.getIsMobile()) {
-      this.assignControlAttributes(this.countdownDiv, 'ima-countdown-div')
-      this.countdownDiv.innerHTML = this.controller.getSettings().adLabel
-      this.countdownDiv.style.display = this.showCountdown ? 'block' : 'none'
-    } else {
-      this.countdownDiv.style.display = 'none'
-    }
+    this.countdownDiv.style.display = 'none'
   }
 
-  this.assignControlAttributes(this.seekBarDiv, 'ima-seek-bar-div')
-  this.seekBarDiv.style.width = '100%'
+  if (!this.vnode.seekBarDiv) {
+    this.assignControlAttributes(this.seekBarDiv, 'ima-seek-bar-div')
+    this.seekBarDiv.style.width = '100%'
 
-  this.assignControlAttributes(this.progressDiv, 'ima-progress-div')
-
-  if (this.vnode.playPauseDiv) {
-    this.vnode.playPauseDiv.$on('click', () => {
-      this.onAdPlayPauseClick()
-    })
-  } else {
-    this.assignControlAttributes(this.playPauseDiv, 'ima-play-pause-div')
-    this.addClass(this.playPauseDiv, 'ima-playing')
-    this.playPauseDiv.addEventListener(
-      'click',
-      this.onAdPlayPauseClick.bind(this),
-      false
-    )
+    this.assignControlAttributes(this.progressDiv, 'ima-progress-div')
   }
 
-  if (this.vnode.muteDiv) {
-    this.vnode.muteDiv.$on('click', () => {
-      this.onAdMuteClick()
-    })
-  } else {
-    this.assignControlAttributes(this.muteDiv, 'ima-mute-div')
-    this.addClass(this.muteDiv, 'ima-non-muted')
-    this.muteDiv.addEventListener('click', this.onAdMuteClick.bind(this), false)
+  this.assignControlAttributes(this.playPauseDiv, 'ima-play-pause-div')
+  this.addClass(this.playPauseDiv, 'ima-playing')
+  this.playPauseDiv.addEventListener(
+    'click',
+    this.onAdPlayPauseClick.bind(this),
+    false
+  )
+
+  this.assignControlAttributes(this.muteDiv, 'ima-mute-div')
+  this.addClass(this.muteDiv, 'ima-non-muted')
+  this.muteDiv.addEventListener('click', this.onAdMuteClick.bind(this), false)
+
+  this.assignControlAttributes(this.sliderDiv, 'ima-slider-div')
+  this.sliderDiv.addEventListener(
+    'mousedown',
+    this.onAdVolumeSliderMouseDown.bind(this),
+    false
+  )
+
+  // Hide volume slider controls on iOS as they aren't supported.
+  if (this.controller.getIsIos()) {
+    this.sliderDiv.style.display = 'none'
   }
 
-  if (this.vnode.sliderDiv) {
-    this.vnode.adControl.$on('changeVolume', value => {
-      this.onPlayerVolumeChanged(value)
-    })
-    this.vnode.adControl.$on('update:volume', value => {
-      this.changeVolume(value)
-    })
-    if (this.controller.getIsIos()) {
-      this.sliderDiv.style.display = 'none'
-    }
-  } else {
-    this.assignControlAttributes(this.sliderDiv, 'ima-slider-div')
-    this.sliderDiv.addEventListener(
-      'mousedown',
-      this.onAdVolumeSliderMouseDown.bind(this),
-      false
-    )
+  this.assignControlAttributes(this.sliderLevelDiv, 'ima-slider-level-div')
 
-    // Hide volume slider controls on iOS as they aren't supported.
-    if (this.controller.getIsIos()) {
-      this.sliderDiv.style.display = 'none'
-    }
-
-    this.assignControlAttributes(this.sliderLevelDiv, 'ima-slider-level-div')
-  }
-
-  if (this.vnode.fullscreenDiv) {
-    this.vnode.fullscreenDiv.$on('click', () => {
-      this.onAdFullscreenClick()
-    })
-  } else {
-    this.assignControlAttributes(this.fullscreenDiv, 'ima-fullscreen-div')
-    this.addClass(this.fullscreenDiv, 'ima-non-fullscreen')
-    this.fullscreenDiv.addEventListener(
-      'click',
-      this.onAdFullscreenClick.bind(this),
-      false
-    )
-  }
-  if (!this.vnode.adControl) {
-    this.adContainerDiv.appendChild(this.controlsDiv)
-    this.controlsDiv.appendChild(this.countdownDiv)
-    this.controlsDiv.appendChild(this.seekBarDiv)
-    this.controlsDiv.appendChild(this.playPauseDiv)
-    this.controlsDiv.appendChild(this.muteDiv)
-    this.controlsDiv.appendChild(this.sliderDiv)
-    this.controlsDiv.appendChild(this.fullscreenDiv)
-    this.seekBarDiv.appendChild(this.progressDiv)
-    this.sliderDiv.appendChild(this.sliderLevelDiv)
-  }
+  this.assignControlAttributes(this.fullscreenDiv, 'ima-fullscreen-div')
+  this.addClass(this.fullscreenDiv, 'ima-non-fullscreen')
+  this.fullscreenDiv.addEventListener(
+    'click',
+    this.onAdFullscreenClick.bind(this),
+    false
+  )
+  this.adContainerDiv.appendChild(this.controlsDiv)
+  this.controlsDiv.appendChild(this.countdownDiv)
+  this.controlsDiv.appendChild(this.seekBarDiv)
+  this.controlsDiv.appendChild(this.playPauseDiv)
+  this.controlsDiv.appendChild(this.muteDiv)
+  this.controlsDiv.appendChild(this.sliderDiv)
+  this.controlsDiv.appendChild(this.fullscreenDiv)
+  this.seekBarDiv.appendChild(this.progressDiv)
+  this.sliderDiv.appendChild(this.sliderLevelDiv)
 }
 
 /**
  * Listener for clicks on the play/pause button during ad playback.
  */
-AdUi.prototype.onAdPlayPauseClick = function() {
+AdUi.prototype.onAdPlayPauseClick = function () {
   this.controller.onAdPlayPauseClick()
 }
 
 /**
  * Listener for clicks on the play/pause button during ad playback.
  */
-AdUi.prototype.onAdMuteClick = function() {
+AdUi.prototype.onAdMuteClick = function () {
   this.controller.onAdMuteClick()
 }
 
 /**
  * Listener for clicks on the fullscreen button during ad playback.
  */
-AdUi.prototype.onAdFullscreenClick = function() {
+AdUi.prototype.onAdFullscreenClick = function () {
   this.controller.toggleFullscreen()
 }
 
 /**
  * Show pause and hide play button
  */
-AdUi.prototype.onAdsPaused = function() {
+AdUi.prototype.onAdsPaused = function () {
   if (this.vnode.muteDiv && this.vnode.adControl) {
     this.vnode.adControl.$props.playing = false
     return
@@ -308,19 +300,19 @@ AdUi.prototype.onAdsPaused = function() {
 /**
  * Show pause and hide play button
  */
-AdUi.prototype.onAdsResumed = function() {
+AdUi.prototype.onAdsResumed = function () {
   this.onAdsPlaying()
   this.showAdControls()
 }
 
-AdUi.prototype.onAdsCompleted = function() {
+AdUi.prototype.onAdsCompleted = function () {
   this.hideAdControls()
 }
 
 /**
  * Show play and hide pause button
  */
-AdUi.prototype.onAdsPlaying = function() {
+AdUi.prototype.onAdsPlaying = function () {
   if (this.vnode.muteDiv && this.vnode.adControl) {
     this.vnode.adControl.$props.playing = true
     return
@@ -336,50 +328,58 @@ AdUi.prototype.onAdsPlaying = function() {
  * @param {number} currentTime Current time of the ad.
  * @param {number} remainingTime Remaining time of the ad.
  * @param {number} duration Duration of the ad.
+ * @param {number} skipOffset skip offset.
  * @param {number} adPosition Index of the ad in the pod.
  * @param {number} totalAds Total number of ads in the pod.
  */
-AdUi.prototype.updateAdUi = function(
+AdUi.prototype.updateAdUi = function (
   currentTime,
   remainingTime,
   duration,
+  skipOffset,
   adPosition,
   totalAds
 ) {
-  // Update countdown timer data
-  const remainingMinutes = Math.floor(remainingTime / 60)
-  let remainingSeconds = Math.floor(remainingTime % 60)
-  if (remainingSeconds.toString().length < 2) {
-    remainingSeconds = '0' + remainingSeconds
-  }
-  let podCount = ': '
-  if (totalAds > 1) {
-    podCount =
-      ' (' +
-      adPosition +
-      ' ' +
-      this.controller.getSettings().adLabelNofN +
-      ' ' +
-      totalAds +
-      '): '
-  }
-  this.countdownDiv.innerHTML =
-    this.controller.getSettings().adLabel +
-    podCount +
-    remainingMinutes +
-    ':' +
-    remainingSeconds
+  if (this.vnode.adControl) {
+    this.vnode.adControl.$props.skipOffset = skipOffset
+    this.vnode.adControl.$props.currentTime = currentTime
+    this.vnode.adControl.$props.duration = duration
+  } else {
+    // Update countdown timer data
+    const remainingMinutes = Math.floor(remainingTime / 60)
+    let remainingSeconds = Math.floor(remainingTime % 60)
+    if (remainingSeconds.toString().length < 2) {
+      remainingSeconds = '0' + remainingSeconds
+    }
+    let podCount = ': '
+    if (totalAds > 1) {
+      podCount =
+        ' (' +
+        adPosition +
+        ' ' +
+        this.controller.getSettings().adLabelNofN +
+        ' ' +
+        totalAds +
+        '): '
+    }
+    this.countdownDiv.innerHTML =
+      this.controller.getSettings().adLabel +
+      podCount +
+      remainingMinutes +
+      ':' +
+      remainingSeconds
 
-  // Update UI
-  const playProgressRatio = currentTime / duration
-  const playProgressPercent = playProgressRatio * 100
-  this.progressDiv.style.width = playProgressPercent + '%'
+    // Update UI
+    const playProgressRatio = currentTime / duration
+    const playProgressPercent = playProgressRatio * 100
+    this.progressDiv.style.width = playProgressPercent + '%'
+  }
 }
 
 /**
  * Handles UI changes when the ad is unmuted.
  */
-AdUi.prototype.unmute = function() {
+AdUi.prototype.unmute = function () {
   if (this.vnode.adControl) {
     this.vnode.adControl.$props.muted = false
     this.vnode.adControl.$props.volume = this.controller.getPlayerVolume()
@@ -394,7 +394,7 @@ AdUi.prototype.unmute = function() {
 /**
  * Handles UI changes when the ad is muted.
  */
-AdUi.prototype.mute = function() {
+AdUi.prototype.mute = function () {
   if (this.vnode.adControl) {
     this.vnode.adControl.$props.muted = true
     this.vnode.adControl.$props.volume = 0
@@ -408,7 +408,7 @@ AdUi.prototype.mute = function() {
 /*
  * Listener for mouse down events during ad playback. Used for volume.
  */
-AdUi.prototype.onAdVolumeSliderMouseDown = function() {
+AdUi.prototype.onAdVolumeSliderMouseDown = function () {
   document.addEventListener('mouseup', this.boundOnMouseUp, false)
   document.addEventListener('mousemove', this.boundOnMouseMove, false)
 }
@@ -416,14 +416,14 @@ AdUi.prototype.onAdVolumeSliderMouseDown = function() {
 /*
  * Mouse movement listener used for volume slider.
  */
-AdUi.prototype.onMouseMove = function(event) {
+AdUi.prototype.onMouseMove = function (event) {
   this.changeVolume(event)
 }
 
 /*
  * Mouse release listener used for volume slider.
  */
-AdUi.prototype.onMouseUp = function(event) {
+AdUi.prototype.onMouseUp = function (event) {
   this.changeVolume(event)
   document.removeEventListener('mouseup', this.boundOnMouseUp)
   document.removeEventListener('mousemove', this.boundOnMouseMove)
@@ -432,7 +432,7 @@ AdUi.prototype.onMouseUp = function(event) {
 /*
  * Utility function to set volume and associated UI
  */
-AdUi.prototype.changeVolume = function(event) {
+AdUi.prototype.changeVolume = function (event) {
   if (this.vnode.adControl) {
     this.vnode.adControl.$props.muted = event == 0
     this.vnode.adControl.$props.volume = event
@@ -459,21 +459,21 @@ AdUi.prototype.changeVolume = function(event) {
 /**
  * Show the ad container.
  */
-AdUi.prototype.showAdContainer = function() {
+AdUi.prototype.showAdContainer = function () {
   this.adContainerDiv.style.display = 'block'
 }
 
 /**
  * Hide the ad container
  */
-AdUi.prototype.hideAdContainer = function() {
+AdUi.prototype.hideAdContainer = function () {
   this.adContainerDiv.style.display = 'none'
 }
 
 /**
  * Handles clicks on the ad container
  */
-AdUi.prototype.onAdContainerClick = function() {
+AdUi.prototype.onAdContainerClick = function () {
   if (this.isAdNonlinear) {
     this.controller.togglePlayback()
   }
@@ -482,23 +482,23 @@ AdUi.prototype.onAdContainerClick = function() {
 /**
  * Resets the state of the ad ui.
  */
-AdUi.prototype.reset = function() {
+AdUi.prototype.reset = function () {
   this.hideAdContainer()
 }
 
 /**
  * Handles ad errors.
  */
-AdUi.prototype.onAdError = function() {
+AdUi.prototype.onAdError = function () {
   this.hideAdContainer()
 }
 
 /**
  * Handles ad break starting.
  *
- * @param {object} adEvent The event fired by the IMA SDK.
+ * @param {Object} adEvent The event fired by the IMA SDK.
  */
-AdUi.prototype.onAdBreakStart = function(adEvent) {
+AdUi.prototype.onAdBreakStart = function (adEvent) {
   this.showAdContainer()
 
   const contentType = adEvent.getAd().getContentType()
@@ -518,7 +518,7 @@ AdUi.prototype.onAdBreakStart = function(adEvent) {
 /**
  * Handles ad break ending.
  */
-AdUi.prototype.onAdBreakEnd = function() {
+AdUi.prototype.onAdBreakEnd = function () {
   const currentAd = this.controller.getCurrentAd()
   if (
     currentAd == null || // hide for post-roll only playlist
@@ -527,21 +527,23 @@ AdUi.prototype.onAdBreakEnd = function() {
     // don't hide for non-linear ads
     this.hideAdContainer()
   }
-  this.controlsDiv.style.display = 'none'
-  this.countdownDiv.innerHTML = ''
+  if (!this.vnode.controlsDiv) {
+    this.controlsDiv.style.display = 'none'
+    this.countdownDiv.innerHTML = ''
+  }
 }
 
 /**
  * Handles when all ads have finished playing.
  */
-AdUi.prototype.onAllAdsCompleted = function() {
+AdUi.prototype.onAllAdsCompleted = function () {
   this.hideAdContainer()
 }
 
 /**
  * Handles when a linear ad starts.
  */
-AdUi.prototype.onLinearAdStart = function() {
+AdUi.prototype.onLinearAdStart = function () {
   // Don't bump container when controls are shown
   this.removeClass(this.adContainerDiv, 'bumpable-ima-ad-container')
   this.isAdNonlinear = false
@@ -550,7 +552,7 @@ AdUi.prototype.onLinearAdStart = function() {
 /**
  * Handles when a non-linear ad starts.
  */
-AdUi.prototype.onNonLinearAdLoad = function() {
+AdUi.prototype.onNonLinearAdLoad = function () {
   // For non-linear ads that show after a linear ad. For linear ads, we show the
   // ad container in onAdBreakStart to prevent blinking in pods.
   this.adContainerDiv.style.display = 'block'
@@ -559,16 +561,16 @@ AdUi.prototype.onNonLinearAdLoad = function() {
   this.isAdNonlinear = true
 }
 
-AdUi.prototype.onPlayerEnterFullscreen = function() {
+AdUi.prototype.onPlayerEnterFullscreen = function () {
   if (this.vnode.adControl) {
     this.vnode.adControl.$props.fullscreen = true
     return
   }
-  this.addClass(this.fullscreenDiv, 'ima-fullscreen') 
+  this.addClass(this.fullscreenDiv, 'ima-fullscreen')
   this.removeClass(this.fullscreenDiv, 'ima-non-fullscreen')
 }
 
-AdUi.prototype.onPlayerExitFullscreen = function() {
+AdUi.prototype.onPlayerExitFullscreen = function () {
   if (this.vnode.adControl) {
     this.vnode.adControl.$props.fullscreen = false
     return
@@ -582,7 +584,7 @@ AdUi.prototype.onPlayerExitFullscreen = function() {
  *
  * @param {number} volume The new player volume.
  */
-AdUi.prototype.onPlayerVolumeChanged = function(volume) {
+AdUi.prototype.onPlayerVolumeChanged = function (volume) {
   if (this.vnode.adControl) {
     this.vnode.adControl.$props.muted = volume == 0
     this.vnode.adControl.$props.volume = volume
@@ -602,7 +604,7 @@ AdUi.prototype.onPlayerVolumeChanged = function(volume) {
 /**
  * Shows ad controls on mouseover.
  */
-AdUi.prototype.showAdControls = function() {
+AdUi.prototype.showAdControls = function () {
   const { disableAdControls } = this.controller.getSettings()
   if (!disableAdControls) {
     this.addClass(this.controlsDiv, 'ima-controls-div-showing')
@@ -612,7 +614,7 @@ AdUi.prototype.showAdControls = function() {
 /**
  * Hide the ad controls.
  */
-AdUi.prototype.hideAdControls = function() {
+AdUi.prototype.hideAdControls = function () {
   this.removeClass(this.controlsDiv, 'ima-controls-div-showing')
 }
 
@@ -622,7 +624,7 @@ AdUi.prototype.hideAdControls = function() {
  * @param {HTMLElement} element Element that needs the controlName assigned.
  * @param {string} controlName Control name to assign.
  */
-AdUi.prototype.assignControlAttributes = function(element, controlName) {
+AdUi.prototype.assignControlAttributes = function (element, controlName) {
   element.id = this.controlPrefix + controlName
   element.className = this.controlPrefix + controlName + ' ' + controlName
 }
@@ -633,7 +635,7 @@ AdUi.prototype.assignControlAttributes = function(element, controlName) {
  * @param {string} className The name of the class.
  * @return {RegExp} The regular expression used to test for that class.
  */
-AdUi.prototype.getClassRegexp = function(className) {
+AdUi.prototype.getClassRegexp = function (className) {
   // Matches on
   // (beginning of string OR NOT word char)
   // classname
@@ -649,7 +651,7 @@ AdUi.prototype.getClassRegexp = function(className) {
  * @return {boolean} True if element has className in class list. False
  *     otherwise.
  */
-AdUi.prototype.elementHasClass = function(element, className) {
+AdUi.prototype.elementHasClass = function (element, className) {
   const classRegexp = this.getClassRegexp(className)
   return classRegexp.test(element.className)
 }
@@ -659,7 +661,7 @@ AdUi.prototype.elementHasClass = function(element, className) {
  * @param {HTMLElement} element Element to which the class will be added.
  * @param {string} classToAdd Class to add.
  */
-AdUi.prototype.addClass = function(element, classToAdd) {
+AdUi.prototype.addClass = function (element, classToAdd) {
   element.className = element.className.trim() + ' ' + classToAdd
 }
 
@@ -669,7 +671,7 @@ AdUi.prototype.addClass = function(element, classToAdd) {
  * @param {HTMLElement} element Element from which the class will be removed.
  * @param {string} classToRemove Class to remove.
  */
-AdUi.prototype.removeClass = function(element, classToRemove) {
+AdUi.prototype.removeClass = function (element, classToRemove) {
   const classRegexp = this.getClassRegexp(classToRemove)
   element.className = element.className.trim().replace(classRegexp, '')
 }
@@ -677,8 +679,15 @@ AdUi.prototype.removeClass = function(element, classToRemove) {
 /**
  * @return {HTMLElement} The div for the ad container.
  */
-AdUi.prototype.getAdContainerDiv = function() {
+AdUi.prototype.getAdContainerDiv = function () {
   return this.adContainerDiv
+}
+
+/**
+ * @return {HTMLElement} The div for the ad control.
+ */
+AdUi.prototype.getControlsDiv = function () {
+  return this.controlsDiv
 }
 
 /**
@@ -686,7 +695,7 @@ AdUi.prototype.getAdContainerDiv = function() {
  *
  * @param {boolean} showCountdownIn Show or hide the countdown timer.
  */
-AdUi.prototype.setShowCountdown = function(showCountdownIn) {
+AdUi.prototype.setShowCountdown = function (showCountdownIn) {
   this.showCountdown = showCountdownIn
   this.countdownDiv.style.display = this.showCountdown ? 'block' : 'none'
 }
