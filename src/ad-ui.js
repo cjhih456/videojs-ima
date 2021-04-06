@@ -40,6 +40,10 @@ const AdUi = function (controller) {
    */
   this.controlsDiv = this.getVNodeElement(this.vnode.controlsDiv)
   /**
+   * Div used to display ad controls.
+   */
+  this.baseDiv = this.getVNodeElement(this.vnode.baseDiv)
+  /**
    * Div used to display ad countdown timer.
    */
   this.countdownDiv = this.getVNodeElement(this.vnode.countdownDiv)
@@ -174,6 +178,10 @@ AdUi.prototype.createControlsWithVnode = function () {
   }
 
   this.vnode.playPauseDiv.$on('click', () => {
+    this.onAdPlayPauseClick()
+  })
+
+  this.vnode.baseDiv.addEventListener('click', () => {
     this.onAdPlayPauseClick()
   })
 

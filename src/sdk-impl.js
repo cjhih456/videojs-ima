@@ -156,8 +156,7 @@ const SdkImpl = function (controller) {
 SdkImpl.prototype.initAdObjects = function () {
   this.adDisplayContainer = new google.ima.AdDisplayContainer(
     this.controller.getAdContainerDiv(),
-    this.controller.getContentPlayer(),
-    this.controller.getControlsDiv()
+    this.controller.getContentPlayer()
   )
 
   this.adsLoader = new google.ima.AdsLoader(this.adDisplayContainer)
@@ -170,11 +169,11 @@ SdkImpl.prototype.initAdObjects = function () {
       .getSettings()
       .setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.DISABLED)
   }
-  // if (this.controller.getSettings().vpaidMode !== undefined) {
-  //   this.adsLoader
-  //     .getSettings()
-  //     .setVpaidMode(this.controller.getSettings().vpaidMode)
-  // }
+  if (this.controller.getSettings().vpaidMode !== undefined) {
+    this.adsLoader
+      .getSettings()
+      .setVpaidMode(this.controller.getSettings().vpaidMode)
+  }
 
   if (this.controller.getSettings().locale) {
     this.adsLoader.getSettings().setLocale(this.controller.getSettings().locale)
@@ -199,7 +198,6 @@ SdkImpl.prototype.initAdObjects = function () {
     this.onAdsLoaderError.bind(this),
     false
   )
-
   this.controller.playerWrapper.vjsPlayer.trigger({
     type: 'ads-loader',
     adsLoader: this.adsLoader
@@ -237,7 +235,7 @@ SdkImpl.prototype.requestAds = function () {
 
   // Populate the adsRequestproperties with those provided in the AdsRequest
   // object in the settings.
-  let providedAdsRequest = this.controller.getSettings().adsRequest
+  const providedAdsRequest = this.controller.getSettings().adsRequest
   if (providedAdsRequest && typeof providedAdsRequest === 'object') {
     Object.keys(providedAdsRequest).forEach(key => {
       adsRequest[key] = providedAdsRequest[key]
@@ -374,13 +372,9 @@ SdkImpl.prototype.initAdsManager = function () {
  */
 SdkImpl.prototype.createAdsRenderingSettings = function () {
   this.adsRenderingSettings = new google.ima.AdsRenderingSettings()
-  this.adsRenderingSettings.append({
-    restoreCustomPlaybackStateOnAdBreakComplete: true,
-    useStyledLinearAds: false,
-    disableUi: true
-  })
+  this.adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true
   if (this.controller.getSettings().adsRenderingSettings) {
-    for (let setting in this.controller.getSettings().adsRenderingSettings) {
+    for (const setting in this.controller.getSettings().adsRenderingSettings) {
       if (setting !== '') {
         this.adsRenderingSettings[
           setting
@@ -469,6 +463,10 @@ SdkImpl.prototype.onAdLoaded = function (adEvent) {
  */
 SdkImpl.prototype.onAdStarted = function (adEvent) {
   this.currentAd = adEvent.getAd()
+  const key = Object.keys(this.currentAd)[0] || undefined
+  if(key && this.currentAd[key]) {
+    this.clickThroughUrl = this.currentAd[key].clickThroughUrl
+  }
   if (this.currentAd.isLinear()) {
     this.adTrackingTimer = setInterval(
       this.onAdPlayheadTrackerInterval.bind(this),
@@ -701,6 +699,7 @@ SdkImpl.prototype.isAdMuted = function () {
  * Pause ads.
  */
 SdkImpl.prototype.pauseAds = function () {
+  this.adsManager.expand()
   this.adsManager.pause()
   this.adPlaying = false
 }

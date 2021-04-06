@@ -164,9 +164,7 @@ const ImaPlugin = function (player, options) {
    * @param {?string} adsResponse The ads response to be requested when the
    *     content loads. Leave blank to use the existing ads response.
    */
-  this.setContentWithAdsResponse = function (contentSrc, adsResponse) {
-    this.controller.setContentWithAdsResponse(contentSrc, adsResponse)
-  }.bind(this)
+  this.setContentWithAdsResponse = function (contentSrc, adsResponse) {}
 
   /**
    * Sets the content of the video player. You should use this method instead
