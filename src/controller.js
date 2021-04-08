@@ -348,6 +348,7 @@ Controller.prototype.onAdsCompleted = function () {
  * @param {number} skipOffset skip offset.
  * @param {number} adPosition Index of the ad in the pod.
  * @param {number} totalAds Total number of ads in the pod.
+ * @param {string} clickThroughUrl click through url.
  */
 Controller.prototype.onAdPlayheadUpdated = function (
   currentTime,
@@ -355,7 +356,8 @@ Controller.prototype.onAdPlayheadUpdated = function (
   duration,
   skipOffset,
   adPosition,
-  totalAds
+  totalAds,
+  clickThroughUrl
 ) {
   this.adUi.updateAdUi(
     currentTime,
@@ -363,7 +365,8 @@ Controller.prototype.onAdPlayheadUpdated = function (
     duration,
     skipOffset,
     adPosition,
-    totalAds
+    totalAds,
+    clickThroughUrl
   )
 }
 
@@ -526,6 +529,13 @@ Controller.prototype.onPlayerExitFullscreen = function () {
 Controller.prototype.onPlayerVolumeChanged = function (volume) {
   this.adUi.onPlayerVolumeChanged(volume)
   this.sdkImpl.onPlayerVolumeChanged(volume)
+}
+
+/**
+ * Called when the player skip clicked.
+ */
+ Controller.prototype.onSkipClicked = function () {
+  this.sdkImpl.onSkipClicked()
 }
 
 /**

@@ -25,6 +25,24 @@
   left: 0 !important;
 }
 
+.ad-base-dir {
+  cursor: pointer;
+}
+
+.ad-info-div, .ad-skip-div{
+  position: absolute !important;
+  background: rgba(0,0,0, 0.6);
+  padding: 4px 8px !important;
+  top: -40px !important;
+  cursor: pointer;
+}
+.ad-info-div {
+  left: 0 !important;
+}
+.ad-skip-div {
+  right: 0 !important;
+}
+
 .ima-ad-container {
   top: 0em;
   position: absolute;

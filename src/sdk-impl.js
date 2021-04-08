@@ -465,7 +465,17 @@ SdkImpl.prototype.onAdStarted = function (adEvent) {
   this.currentAd = adEvent.getAd()
   const key = Object.keys(this.currentAd)[0] || undefined
   if(key && this.currentAd[key]) {
+    const currentAd = this.currentAd[key]
     this.clickThroughUrl = this.currentAd[key].clickThroughUrl
+    this.controller.onAdPlayheadUpdated(
+      0,
+      currentAd.duration,
+      currentAd.duration,
+      currentAd.skippable && currentAd.skipTimeOffset || 0,
+      currentAd.adPodInfo && currentAd.adPodInfo.adPosition || 1,
+      currentAd.adPodInfo && currentAd.adPodInfo.totalAds || 1,
+      this.currentAd[key].clickThroughUrl
+    )
   }
   if (this.currentAd.isLinear()) {
     this.adTrackingTimer = setInterval(
@@ -537,7 +547,8 @@ SdkImpl.prototype.onAdPlayheadTrackerInterval = function () {
     duration,
     skipOffset,
     adPosition,
-    totalAds
+    totalAds,
+    this.clickThroughUrl
   )
 }
 
@@ -642,6 +653,16 @@ SdkImpl.prototype.onPlayerVolumeChanged = function (volume) {
     this.adMuted = false
   }
 }
+
+/**
+ * Called when the player skip clicked.
+ */
+ SdkImpl.prototype.onSkipClicked = function () {
+  if (this.adsManager) {
+    this.adsManager.skip()
+  }
+}
+
 
 /**
  * Called when the player wrapper detects that the player has been resized.

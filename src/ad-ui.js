@@ -146,6 +146,9 @@ AdUi.prototype.createAdContainer = function () {
     this.vnode.adControl.$on('click', () => {
       this.onAdContainerClick()
     })
+    this.vnode.adControl.$on('click:skip', () => {
+      this.onSkipClicked()
+    })
     this.createControlsWithVnode()
     this.controller.injectAdContainerDiv(this.adContainerDiv)
   } else {
@@ -194,6 +197,9 @@ AdUi.prototype.createControlsWithVnode = function () {
   })
   this.vnode.adControl.$on('update:volume', value => {
     this.changeVolume(value)
+  })
+  this.vnode.adControl.$on('click:open', () => {
+    this.onAdPauseClick()
   })
   if (this.controller.getIsIos()) {
     this.sliderDiv.style.display = 'none'
@@ -277,6 +283,9 @@ AdUi.prototype.onAdPlayPauseClick = function () {
   this.controller.onAdPlayPauseClick()
 }
 
+AdUi.prototype.onAdPauseClick = function () {
+  this.controller.pauseAd()
+}
 /**
  * Listener for clicks on the play/pause button during ad playback.
  */
@@ -339,6 +348,7 @@ AdUi.prototype.onAdsPlaying = function () {
  * @param {number} skipOffset skip offset.
  * @param {number} adPosition Index of the ad in the pod.
  * @param {number} totalAds Total number of ads in the pod.
+ * @param {string} clickThroughUrl click through url.
  */
 AdUi.prototype.updateAdUi = function (
   currentTime,
@@ -346,12 +356,14 @@ AdUi.prototype.updateAdUi = function (
   duration,
   skipOffset,
   adPosition,
-  totalAds
+  totalAds,
+  clickThroughUrl
 ) {
   if (this.vnode.adControl) {
     this.vnode.adControl.$props.skipOffset = skipOffset
     this.vnode.adControl.$props.currentTime = currentTime
     this.vnode.adControl.$props.duration = duration
+    this.vnode.adControl.$props.clickThroughUrl = clickThroughUrl
   } else {
     // Update countdown timer data
     const remainingMinutes = Math.floor(remainingTime / 60)
@@ -485,6 +497,13 @@ AdUi.prototype.onAdContainerClick = function () {
   if (this.isAdNonlinear) {
     this.controller.togglePlayback()
   }
+}
+
+/**
+ * Called when the player skip clicked.
+ */
+ AdUi.prototype.onSkipClicked = function () {
+  this.controller.onSkipClicked()
 }
 
 /**
